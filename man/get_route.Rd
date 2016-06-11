@@ -4,41 +4,12 @@
 \alias{get_route}
 \title{GetRoute}
 \usage{
-get_route(origin, destination, mode = c("driving", "walking", "bicycling",
-  "transit"), key = NULL, output_format = c("data.frame", "JSON"))
+get_route(...)
 }
 \arguments{
-\item{origin}{numeric Vector of lat/lon coordinates, or an address string}
-
-\item{destination}{numeric Vector of lat/lon coordinates, or an address string}
-
-\item{mode}{string. One of 'driving', 'walking' or 'bicycling'}
-
-\item{key}{string A valid Google Developers Directions API key}
-
-\item{output_format}{string Either 'data.frame' or 'JSON'}
-}
-\value{
-Either data.frame or JSON string of the route between origin and destination
+\item{...}{arguments passed to google_directions. Legacy - so taht old 'get_route() calls will still enter this function.}
 }
 \description{
-Uses Google Maps Directions API to search for the route between an origin and destination.
-}
-\examples{
-\dontrun{
-## using lat/long coordinates
-get_route(origin = c(-37.8179746, 144.9668636),
-          destination = c(-37.81659, 144.9841),
-          mode = "walking",
-          key = "<your valid api key>")
-
-
-## using address string
-get_route(origin = "Flinders Street Station, Melbourne",
-         destination = "MCG, Melbourne",
-         mode = "walking",
-         key = "<your valid api key>")
-
-}
+This function is deprecated. Please use \link{google_directions}
 }
 

@@ -1,29 +1,23 @@
 context("Google elevation")
 
-skip_api_key <- function() {
-  skip("key not available")
-}
-
 test_that("df_locations is a data.frame",{
 
   expect_error(google_elevation(df_locations = c(-37.81659, -37.88950),
                    key = "abc",
-                   simplify = TRUE),
-               "df_locations should be a data.frame containing at least two columns of lat and lon coordianates")
+                   simplify = TRUE))
 
 })
 
-# test_that("location errors on incorrect type",{
-#
-#   df <- data.frame(lat = c(-37.81659, -37.88950),
-#                    lon = c(144.9841, 144.9841))
-#
-#   expect_error(google_elevation(df_locations = df,
-#                                 location_type = "route",
-#                                 key = "abc"),
-#                "'arg' should be oneof \"individual\", \"path\"")
-#
-# })
+test_that("location errors on incorrect type",{
+
+  df <- data.frame(lat = c(-37.81659, -37.88950),
+                   lon = c(144.9841, 144.9841))
+
+  expect_error(google_elevation(df_locations = df,
+                                location_type = "route",
+                                key = "abc"))
+
+})
 
 test_that("df_locations contains correctly named columns",{
 
@@ -64,20 +58,52 @@ test_that("error when samples is not logical",{
                "simplify must be logical - TRUE or FALSE")
 })
 
-test_that("warning issued when samples is NULL", {
 
-  ## skip this test
-  skip_api_key()
+test_that("warning issued when samples is NULL", {
 
   df <- data.frame(lat = c(-37.81659, -37.88950),
                    lon = c(144.9841, 144.9841))
 
   expect_warning(google_elevation(df_locations = df,
-                                location_type = "path",
-                                samples = NULL,
-                                key = "abc",
-                                simplify = TRUE),
-               "samples has not been specified. 3 will be used")
+                                  location_type = "path",
+                                  samples = NULL,
+                                  key = "abc",
+                                  simplify = TRUE),
+                 "samples has not been specified. 3 will be used")
+})
+
+
+test_that("polyline correctly formed", {
+
+  polyline <- c("abc", "xyz")
+
+  expect_error(
+    google_elevation(polyline = polyline, key = 'abc'),
+    'please only specify a single polyline'
+  )
+
+  expect_equal(
+    google_elevation(polyline = "polyline", key = 'abc')$error_message,
+    "The provided API key is invalid."
+  )
+
+  expect_warning(
+    expect_error(
+      google_elevation(polyline = paste0(rep('a', 8192), collapse = ""), key = 'abc')
+      )
+  )
+
+})
+
+test_that("data is attempted to be downloaded", {
+
+  df <- data.frame(lat = c(-37.81659, -37.88950),
+                   lon = c(144.9841, 144.9841))
+
+  expect_true(google_elevation(df_locations = df,
+                               key = "abc")$error_message == "The provided API key is invalid.")
+
+
 })
 
 

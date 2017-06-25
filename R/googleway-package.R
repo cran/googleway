@@ -157,15 +157,16 @@ directions_data <- function(base_url,
     waypoints <- sapply(1:length(waypoints), function(x) {
       if(length(names(waypoints)) > 0){
         if(names(waypoints)[x] == "via"){
-          paste0("via:", fun_check_location(waypoints[[x]]), "waypoints")
+          paste0("via:", fun_check_location(waypoints[[x]]))
         }else{
           ## 'stop' is the default in google, and the 'stop' identifier is not needed
-          fun_check_location(waypoints[[x]], "waypoints")
+          fun_check_location(waypoints[[x]])
         }
       }else{
-        fun_check_location(waypoints[[x]], "waypoints")
+        fun_check_location(waypoints[[x]])
       }
     })
+
     if(optimise_waypoints == TRUE){
       waypoints <- paste0("optimize:true|", paste0(waypoints, collapse = "|"))
     }else{
@@ -201,6 +202,7 @@ directions_data <- function(base_url,
             "alternatives" = alternatives,
             "avoid" = avoid,
             "units" = units,
+            "mode" = mode,
             "transit_mode" = transit_mode,
             "transit_routing_preference" = transit_routing_preference,
             "language" = language,
@@ -219,6 +221,7 @@ directions_data <- function(base_url,
 
 fun_download_data <- function(map_url, simplify, curl_proxy = NULL){
 
+  out <- NULL
   ## check map_url is valid
   if(length(map_url) > 1)
     stop("invalid map_url")
@@ -249,7 +252,7 @@ fun_download_data <- function(map_url, simplify, curl_proxy = NULL){
     },
     error = function(cond){
       close(con)
-      cat("There was an error downloading results. Please manually check this URL is valid, and if so issue a bug report citing this URL (note: your API key has been removed, so you will need to add that back in) \n\n", gsub("key=.*","",map_url))
+      warning("There was an error downloading results. Please manually check the following URL is valid by entering it into a browswer. If valid, please file a bug report citing this URL (note: your API key has been removed, so you will need to add that back in) \n\n", gsub("key=.*","",map_url), "key=", sep = "")
     })
   }
   return(out)

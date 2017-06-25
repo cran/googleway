@@ -15,7 +15,7 @@
 #' If both are supplied, \code{departure_time} will be used.
 #' @param waypoints list of waypoints, expressed as either a \code{vector} of
 #' lat/lon coordinates, or a \code{string} address to be geocoded. Only available
-#' for transit, walking or bicycling modes. List elements must be named either
+#' for driving, walking or bicycling modes. List elements must be named either
 #' 'stop' or 'via', where 'stop' is used to indicate a stopover for a waypoint,
 #' and 'via' will not stop at the waypoint.
 #' See \url{https://developers.google.com/maps/documentation/directions/intro#Waypoints} for details
@@ -46,7 +46,7 @@
 #' ("top-level domain"). See region basing for details
 #' \url{https://developers.google.com/maps/documentation/directions/intro#RegionBiasing}
 #' @param key \code{string} - a valid Google Developers Directions API key
-#' @param simplify \code{logical} - indicates if the returned JSON should be coerced into a list
+#' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
 #' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the route between origin and destination
 #' @examples

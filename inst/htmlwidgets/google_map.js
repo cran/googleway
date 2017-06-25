@@ -67,7 +67,13 @@ HTMLWidgets.widget({
               var map = new google.maps.Map(mapDiv, {
                 center: {lat: x.lat, lng: x.lng},
                 zoom: x.zoom,
-                styles: JSON.parse(x.styles)
+                styles: JSON.parse(x.styles),
+                zoomControl: x.zoomControl,
+                mapTypeControl: x.mapTypeControl,
+                scaleControl: x.scaleControl,
+                streetViewControl: x.streetViewControl,
+                rotateControl: x.rotateControl,
+                fullscreenControl: x.fullscreenControl
               });
 
               //global map object
@@ -97,7 +103,13 @@ HTMLWidgets.widget({
               var map = new google.maps.Map(mapDiv, {
                 center: {lat: x.lat, lng: x.lng},
                 zoom: x.zoom,
-                styles: JSON.parse(x.styles)
+                styles: JSON.parse(x.styles),
+                zoomControl: x.zoomControl,
+                mapTypeControl: x.mapTypeControl,
+                scaleControl: x.scaleControl,
+                streetViewControl: x.streetViewControl,
+                rotateControl: x.rotateControl,
+                fullscreenControl: x.fullscreenControl
               });
 
               window[el.id + 'map'] = map;
@@ -159,6 +171,39 @@ function update_style(map_id, style){
   window[map_id + 'map'].set('styles', JSON.parse(style));
 }
 
+/**
+ * adds a fusion layer to the map
+ *
+ */
+function add_fusion(map_id, query, styles, heat, layer_id){
+
+// TODO: extend map bounds
+
+  window[map_id + 'googleFusion' + layer_id] = [];
+
+  var s = JSON.parse(styles);
+
+  var layer = new google.maps.FusionTablesLayer({
+    query: query,
+    styles: s,
+    heatmap: { enabled: heat }
+  });
+
+  window[map_id + 'googleFusion' + layer_id] = layer;
+  layer.setMap(window[map_id + 'map']);
+}
+
+/**
+ * clear fusion
+ *
+ * clears fusion layer
+ */
+function clear_fusion(map_id, layer_id){
+  window[map_id + 'googleFusion' + layer_id].setMap(null);
+  window[map_id + 'googleFusion' + layer_id] = null;
+}
+
+
 
 /**
  * Add markers
@@ -188,7 +233,7 @@ function add_markers(map_id, data_markers, cluster, layer_id){
 
     var marker = new google.maps.Marker({
       id: data_markers[i].id,
-      icon: { url: data_markers[i].url },
+      icon: data_markers[i].url,
       position: latlon,
       draggable: data_markers[i].draggable,
       opacity: data_markers[i].opacity,
@@ -273,9 +318,11 @@ function clear_markers(map_id, layer_id){
   for (i = 0; i < window[map_id + 'googleMarkers' + layer_id ].length; i++){
       window[map_id + 'googleMarkers' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googleMarkers' + layer_id] = null;
 
   if(window[map_id + 'googleMarkerClusterer' + layer_id]){
     window[map_id + 'googleMarkerClusterer' + layer_id].clearMarkers();
+    window[map_id + 'googleMarkerClusterer' + layer_id] = null;
   }
 
 }
@@ -350,6 +397,8 @@ function clear_circles(map_id, layer_id){
   for (i = 0; i < window[map_id + 'googleCircles' + layer_id].length; i++){
     window[map_id + 'googleCircles' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googleCircles' + layer_id] = null;
+
 }
 
 /**
@@ -566,6 +615,7 @@ function update_heatmap(map_id, data_heatmap, layer_id){
  */
 function clear_heatmap(map_id, layer_id){
   window[map_id + 'googleHeatmap' + layer_id].setMap(null);
+  window[map_id + 'googleHeatmap' + layer_id] = null;
 }
 
 /** Add polylines
@@ -736,6 +786,7 @@ function clear_polylines(map_id, layer_id){
   for (i = 0; i < window[map_id + 'googlePolyline' + layer_id].length; i++){
     window[map_id + 'googlePolyline' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googlePolyline' + layer_id] = null;
 }
 
 
@@ -936,6 +987,7 @@ function clear_polygons(map_id, layer_id){
  for (i = 0; i < window[map_id + 'googlePolygon' + layer_id].length; i++){
     window[map_id + 'googlePolygon' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googlePolygon' + layer_id] = null;
 }
 
 
@@ -1008,6 +1060,7 @@ function clear_rectangles(map_id, layer_id){
   for (i = 0; i < window[map_id + 'googleRectangles' + layer_id].length; i++){
     window[map_id + 'googleRectangles' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googleRectangles' + layer_id] = null;
 }
 
 
@@ -1086,7 +1139,7 @@ function add_kml(map_id, kml_data, layer_id){
   window[map_id + 'googleKml' + layer_id] = [];
 
   var kmlLayer = new google.maps.KmlLayer({
-    url: kml_data,
+    url: kml_data[0].url,
     map: window[map_id + 'map']
   });
 
@@ -1094,12 +1147,49 @@ function add_kml(map_id, kml_data, layer_id){
 
 }
 
-function clear_kml(map_id, layer_id){
 
+function clear_kml(map_id, layer_id){
   for (i = 0; i < window[map_id + 'googleKml' + layer_id].length; i++){
     window[map_id + 'googleKml' + layer_id][i].setMap(null);
   }
+  window[map_id + 'googleKml' + layer_id] = null;
+}
 
+function add_overlay(map_id, data_overlay, layer_id){
+
+  window[map_id + 'googleOverlay' + layer_id] = [];
+
+  var latlonNorthEast = new google.maps.LatLng(data_overlay[0].north, data_overlay[0].east);
+  var latlonSouthWest = new google.maps.LatLng(data_overlay[0].south, data_overlay[0].west);
+
+  var bounds = {
+    north: data_overlay[0].north,
+    east: data_overlay[0].east,
+    south: data_overlay[0].south,
+    west: data_overlay[0].west
+  };
+
+  var overlayLayer = new google.maps.GroundOverlay(
+    data_overlay[0].url,
+    bounds
+  );
+
+  overlayLayer.setMap(window[map_id + 'map']);
+
+  window[map_id + 'mapBounds'].extend(latlonNorthEast);
+  window[map_id + 'mapBounds'].extend(latlonSouthWest);
+
+  window[map_id + 'map'].fitBounds(window[map_id + 'mapBounds'])
+  window[map_id + 'googleOverlay' + layer_id].push(overlayLayer);
+
+}
+
+
+function clear_overlay(map_id, layer_id){
+  for (i = 0; i < window[map_id + 'googleOverlay' + layer_id].length; i++){
+    window[map_id + 'googleOverlay' + layer_id][i].setMap(null);
+  }
+  window[map_id + 'googleOverlay' + layer_id] = null;
 }
 
 function add_mouseOver(map_id, mapObject, infoWindow, objectAttribute, attributeValue, layer_id, layerType){
@@ -1477,11 +1567,10 @@ function clear_transit(map_id){
 
 function clear_search(map_id){
   window[map_id + 'googlePlaceMarkers'].forEach(function(marker) {
-        marker.setMap(null);
-      });
-      window[map_id + 'googlePlaceMarkers'] = [];
+    marker.setMap(null);
+  });
+  window[map_id + 'googlePlaceMarkers'] = [];
 }
-
 
 function findById(source, id) {
   for (var i = 0; i < source.length; i++) {

@@ -4,6 +4,7 @@
 \alias{clear}
 \alias{clear_bicycling}
 \alias{clear_circles}
+\alias{clear_fusion}
 \alias{clear_heatmap}
 \alias{clear_markers}
 \alias{clear_polygons}
@@ -30,6 +31,8 @@ clear_polylines(map, layer_id = NULL)
 clear_polygons(map, layer_id = NULL)
 
 clear_rectangles(map, layer_id = NULL)
+
+clear_fusion(map, layer_id = NULL)
 }
 \arguments{
 \item{map}{a googleway map object created from \code{google_map()}}

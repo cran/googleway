@@ -31,21 +31,29 @@
 #' mouse rolls over the marker
 #' @param mouse_over_group string specifying the column of data specifying which
 #' groups of circles to highlight on mouseover
+#' @param marker_icon string specifying the column of data containing a link/URL to
+#' an image to use for a marker
 #' @param layer_id single value specifying an id for the layer.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @examples
 #' \dontrun{
 #'
-#' df <- structure(list(lat = c(-37.8201904296875, -37.8197288513184,
-#' -37.8191299438477, -37.8187675476074, -37.8186187744141, -37.8181076049805
-#' ), lon = c(144.968612670898, 144.968414306641, 144.968139648438,
-#' 144.967971801758, 144.967864990234, 144.967636108398), weight = c(31.5698964400217,
-#' 97.1629025738221, 58.9051092562731, 76.3215389118996, 37.8982300488278,
-#' 77.1501972114202), opacity = c(0.2, 0.2, 0.2, 0.2, 0.2, 0.2)), .Names = c("lat",
-#' "lon", "weight", "opacity"), row.names = 379:384, class = "data.frame")
+#' map_key <- "your api key"
 #'
-#' google_map(key = map_key, data = df) %>%
-#'  add_markers(lat = "lat", lon = "lon", info_window = "weight")
+#' google_map(key = map_key, data = tram_stops) %>%
+#'  add_markers(lat = "stop_lat", lon = "stop_lon", info_window = "stop_name")
+#'
+#'
+#' ## using marker icons
+#' iconUrl <- paste0("https://developers.google.com/maps/documentation/",
+#' "javascript/examples/full/images/beachflag.png")
+#'
+#' tram_stops$icon <- iconUrl
+#'
+#' google_map(key = map_key, data = tram_stops) %>%
+#'   add_markers(lat = "stop_lat", lon = "stop_lon", marker_icon = "icon")
 #'
 #' }
 #' @export
@@ -63,7 +71,9 @@ add_markers <- function(map,
                         info_window = NULL,
                         mouse_over = NULL,
                         mouse_over_group = NULL,
-                        layer_id = NULL)
+                        marker_icon = NULL,
+                        layer_id = NULL,
+                        digits = 4)
 {
 
   ## TODO:
@@ -83,6 +93,9 @@ add_markers <- function(map,
     data <- longitude_column(data, lon, 'add_markers')
     lon <- "lng"
   }
+
+  if(!is.null(colour) & !is.null(marker_icon))
+    stop("only one of colour or icon can be used")
 
   if(!is.null(colour)){
     if(!all((tolower(data[, colour])) %in% c("red","blue","green","lavender")))
@@ -128,6 +141,9 @@ add_markers <- function(map,
   if(!is.null(mouse_over_group))
     markers[, "mouse_over_group"] <- as.character(data[, mouse_over_group])
 
+  if(!is.null(marker_icon))
+    markers[, "url"] <- as.character(data[, marker_icon])
+
   # if(sum(is.na(markers)) > 0)
   #   warning("There are some NAs in your data. These may affect the markers that have been plotted.")
 
@@ -142,7 +158,7 @@ add_markers <- function(map,
     markers <- merge(markers, df_colours, by.x = "colour", by.y = "colour", all.x = TRUE)
   }
 
-  markers <- jsonlite::toJSON(markers)
+  markers <- jsonlite::toJSON(markers, digits = digits)
 
   invoke_method(map, data, 'add_markers', markers, cluster, layer_id)
 }
@@ -242,6 +258,8 @@ update_style <- function(map, styles = NULL){
 #' @param z_index single value specifying where the circles appear in the layering
 #' of the map objects. Layers with a higher \code{z_index} appear on top of those with
 #' a lower \code{z_index}. See details.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @details
 #' \code{z_index} values define the order in which objects appear on the map.
@@ -281,7 +299,8 @@ add_circles <- function(map,
                         mouse_over_group = NULL,
                         info_window = NULL,
                         layer_id = NULL,
-                        z_index = NULL){
+                        z_index = NULL,
+                        digits = 4){
 
   if(is.null(lat)){
     data <- latitude_column(data, lat, 'add_circles')
@@ -327,7 +346,7 @@ add_circles <- function(map,
   # if(sum(is.na(Circles)) > 0)
   #   warning("There are some NAs in your data. These may affect the circles that have been plotted.")
 
-  Circles <- jsonlite::toJSON(Circles)
+  Circles <- jsonlite::toJSON(Circles, digits = digits)
 
   invoke_method(map, data, 'add_circles', Circles, layer_id)
 }
@@ -436,6 +455,8 @@ update_circles <- function(map, data, id,
 #' @param option_opacity The opacity of the heatmap, expressed as a number between
 #' 0 and 1. Defaults to 0.6.
 #' @param layer_id single value specifying an id for the layer.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @details
 #' \code{option_gradient} colours can be two of the R colour specifications;
@@ -475,11 +496,12 @@ add_heatmap <- function(map,
                         option_dissipating = FALSE,
                         option_radius = 0.01,
                         option_opacity = 0.6,
-                        layer_id = NULL
+                        layer_id = NULL,
+                        digits = 4
                         ){
 
 
-  ## TODO
+  ## TODO:
   ## - max intensity
   ## - allow columns to be used for other options
   ## -- e.g., allow a column called 'opacity' to be used as a 'title'
@@ -540,7 +562,7 @@ add_heatmap <- function(map,
     heatmap_options$gradient <- list(g)
   }
 
-  Heatmap <- jsonlite::toJSON(Heatmap)
+  Heatmap <- jsonlite::toJSON(Heatmap, digits = digits)
   heatmap_options <- jsonlite::toJSON(heatmap_options)
 
   invoke_method(map, data, 'add_heatmap', Heatmap, heatmap_options, layer_id)
@@ -713,6 +735,8 @@ clear_bicycling <- function(map){
 #' @param z_index single value specifying where the polylines appear in the layering
 #' of the map objects. Layers with a higher \code{z_index} appear on top of those with
 #' a lower \code{z_index}. See details.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @details
 #' \code{z_index} values define the order in which objects appear on the map.
@@ -787,7 +811,8 @@ add_polylines <- function(map,
                           mouse_over_group = NULL,
                           update_map_view = TRUE,
                           layer_id = NULL,
-                          z_index = NULL){
+                          z_index = NULL,
+                          digits = 4){
 
   ## TODO:
   ## - warning if there are non-unique attributes for cooridnate lines
@@ -881,7 +906,7 @@ add_polylines <- function(map,
 
     lst_polyline <- objPolylineCoords(polyline, ids, keep)
 
-    js_polyline <- jsonlite::toJSON(lst_polyline, auto_unbox = T)
+    js_polyline <- jsonlite::toJSON(lst_polyline, digits = digits, auto_unbox = T)
 
   }else{
 
@@ -1126,6 +1151,8 @@ clear_polylines <- function(map, layer_id = NULL){
 #' @param z_index single value specifying where the polygons appear in the layering
 #' of the map objects. Layers with a higher \code{z_index} appear on top of those with
 #' a lower \code{z_index}. See details.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @details
 #' \code{z_index} values define the order in which objects appear on the map.
@@ -1164,11 +1191,11 @@ add_polygons <- function(map,
                         editable = NULL,
                         update_map_view = TRUE,
                         layer_id = NULL,
-                        z_index = NULL
+                        z_index = NULL,
+                        digits = 4
                         ){
 
   ## TODO
-  ##
   ## - holes must be wound in the opposite direction
 
   if(is.null(polyline) & (is.null(lat) | is.null(lon)))
@@ -1282,7 +1309,7 @@ add_polygons <- function(map,
 
     lst_polygon <- objPolygonCoords(polygon, ids, keep)
 
-    js_polygon <- jsonlite::toJSON(lst_polygon, auto_unbox = T)
+    js_polygon <- jsonlite::toJSON(lst_polygon, digits = digits, auto_unbox = T)
 
   }else{
 
@@ -1488,6 +1515,8 @@ clear_polygons <- function(map, layer_id = NULL){
 #' @param z_index single value specifying where the rectangles appear in the layering
 #' of the map objects. Layers with a higher \code{z_index} appear on top of those with
 #' a lower \code{z_index}. See details.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
 #'
 #' @details
 #' \code{z_index} values define the order in which objects appear on the map.
@@ -1543,7 +1572,8 @@ add_rectangles <- function(map,
                            mouse_over_group = NULL,
                            info_window = NULL,
                            layer_id = NULL,
-                           z_index = NULL){
+                           z_index = NULL,
+                           digits = 4){
 
   layer_id <- LayerId(layer_id)
 
@@ -1582,7 +1612,7 @@ add_rectangles <- function(map,
   # if(sum(is.na(Rectangle)) > 0)
   #   warning("There are some NAs in your data. These may affect the circles that have been plotted.")
 
-  Rectangle <- jsonlite::toJSON(Rectangle)
+  Rectangle <- jsonlite::toJSON(Rectangle, digits = digits)
 
 
   invoke_method(map, data, 'add_rectangles', Rectangle, layer_id)
@@ -1661,5 +1691,182 @@ update_rectangles <- function(map, data, id,
 
   invoke_method(map, data = NULL, 'update_rectangles', rectangleUpdate, layer_id)
 
-
 }
+
+#' Add Overlay
+#'
+#' Adds a ground overlay to a map. The overlay can only be added from a URL
+#'
+#' @param map a googleway map object created from \code{google_map()}
+#' @param north northern-most latitude coordinate
+#' @param east eastern-most longitude
+#' @param south southern-most latitude coordinate
+#' @param west western-most longitude
+#' @param overlay_url URL string specifying the location of the overlay layer
+#' @param layer_id single value specifying an id for the layer.
+#' @param digits integer. Use this parameter to specify how many digits (decimal places)
+#' should be used for the latitude / longitude coordinates.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' map_key <- 'your_api_key'
+#'
+#' google_map(key = map_key) %>%
+#'   add_overlay(north = 40.773941,south = 40.712216, east = -74.12544, west = -74.22655,
+#'                overlay_url = "https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg")
+#'
+#'
+#' }
+#' @export
+add_overlay <- function(map,
+                        north,
+                        east,
+                        south,
+                        west,
+                        overlay_url,
+                        layer_id = NULL,
+                        digits = 4){
+
+  URLCheck(overlay_url)
+  LatitudeCheck(north, "north")
+  LatitudeCheck(south, "south")
+  LongitudeCheck(east, "east")
+  LongitudeCheck(west, "west")
+
+  layer_id <- LayerId(layer_id)
+
+  overlay <- jsonlite::toJSON(data.frame(url = overlay_url,
+                                       north = north,
+                                       south = south,
+                                       west = west,
+                                       east = east),
+                              digits = digits)
+
+  invoke_method(map, data = NULL, 'add_overlay', overlay, layer_id)
+}
+
+
+#' Add KML
+#'
+#' Adds a KML layer to a map.
+#'
+#' @param map a googleway map object created from \code{google_map()}
+#' @param kml_url URL string specifying the location of the kml layer
+#' @param layer_id single value specifying an id for the layer.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' map_key <- 'your_api_key'
+#'
+#' kmlUrl <- paste0('https://developers.google.com/maps/',
+#' 'documentation/javascript/examples/kml/westcampus.kml')
+#'
+#' google_map(key = map_key) %>%
+#'   add_kml(kml_url = kmlUrl)
+#'
+#' }
+#' @export
+add_kml <- function(map, kml_url, layer_id = NULL){
+
+  URLCheck(kml_url)
+
+  layer_id <- LayerId(layer_id)
+
+  kml <- jsonlite::toJSON(data.frame(url = kml_url))
+
+  invoke_method(map, data = NULL, 'add_kml', kml, layer_id)
+}
+
+
+#' Add Fusion
+#'
+#' Adds a fusion table layer to a map.
+#'
+#' @param map a googleway map object created from \code{google_map()}
+#' @param query a \code{data.frame} of 2 or 3 columns, and only 1 row. Two columns
+#' must be 'select' and 'from', and the third 'where'. The 'select' value is the column
+#' name (from the fusion table) containing the location information, and the
+#' 'from' value is the encrypted table Id. The 'where' value is a string specifying the
+#' 'where' condition on the data query.
+#' @param styles a \code{list} object used to apply colour, stroke weight and
+#' opacity to lines and polygons. See examples to see how the list should be
+#' constructed.
+#' @param heatmap logical indicating whether to show a heatmap.
+#' @param layer_id single value specifying an id for the layer.
+#' @examples
+#' \dontrun{
+#'
+#' mapKey <- 'your_api_key'
+#'
+#' qry <- data.frame(select = 'address',
+#'     from = '1d7qpn60tAvG4LEg4jvClZbc1ggp8fIGGvpMGzA',
+#'     where = 'ridership > 200')
+#'
+#' google_map(key = mapKey, location = c(41.8, -87.7), zoom = 9) %>%
+#'   add_fusion(query = qry)
+#'
+#'
+#'
+#' qry <- data.frame(select = 'geometry',
+#'    from = '1ertEwm-1bMBhpEwHhtNYT47HQ9k2ki_6sRa-UQ')
+#'
+#' styles <- list(
+#'   list(
+#'     polygonOptions = list( fillColor = "#00FF00", fillOpacity = 0.3)
+#'     ),
+#'   list(
+#'     where = "birds > 300",
+#'     polygonOptions = list( fillColor = "#0000FF" )
+#'     ),
+#'   list(
+#'     where = "population > 5",
+#'     polygonOptions = list( fillOpacity = 1.0 )
+#'  )
+#' )
+#'
+#' google_map(key = mapKey, location = c(-25.3, 133), zoom = 4) %>%
+#'   add_fusion(query = qry, styles = styles)
+#'
+#' qry <- data.frame(select = 'location',
+#'     from = '1xWyeuAhIFK_aED1ikkQEGmR8mINSCJO9Vq-BPQ')
+#'
+#' google_map(key = mapKey, location = c(0, 0), zoom = 1) %>%
+#'   add_fusion(query = qry, heatmap = T)
+#'
+#' }
+#'
+#' @export
+add_fusion <- function(map, query, styles = NULL, heatmap = FALSE, layer_id = NULL){
+
+  ## TODO:
+  ## - check each 'value' is a single value
+  ## - update bounds on layer
+  ## - info window
+
+  ## The Google Maps API can't use values inside arrays, so we need
+  ## to get rid of any arrays.
+  ## - remove square brackets around value
+  LogicalCheck(heatmap)
+
+  query <- gsub("\\[|\\]", "", jsonlite::toJSON(query))
+
+  style <- jsonlite::toJSON(styles)
+  style <- gsub("\\[|\\]", "", substr(style, 2, (nchar(style) - 1)))
+  style <- paste0("[", style, "]")
+
+  layer_id <- LayerId(layer_id)
+
+  invoke_method(map, data = NULL, 'add_fusion', query, style, heatmap, layer_id)
+}
+
+#' @rdname clear
+#' @export
+clear_fusion <- function(map, layer_id = NULL){
+
+  layer_id <- LayerId(layer_id)
+
+  invoke_method(map, data = NULL, 'clear_fusion', layer_id)
+}
+

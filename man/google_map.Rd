@@ -6,7 +6,10 @@
 \title{Google map}
 \usage{
 google_map(key, data = NULL, location = NULL, zoom = NULL, width = NULL,
-  height = NULL, padding = 0, styles = NULL, search_box = FALSE)
+  height = NULL, padding = 0, styles = NULL, search_box = FALSE,
+  zoom_control = TRUE, map_type_control = TRUE, scale_control = FALSE,
+  street_view_control = TRUE, rotate_control = TRUE,
+  fullscreen_control = TRUE)
 }
 \arguments{
 \item{key}{A valid Google Maps API key. see Details}
@@ -26,6 +29,18 @@ google_map(key, data = NULL, location = NULL, zoom = NULL, width = NULL,
 \item{styles}{JSON string representation of a valid Google Maps styles Array. See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/styling}}
 
 \item{search_box}{\code{boolean} indicating if a search box should be placed on the map}
+
+\item{zoom_control}{logical}
+
+\item{map_type_control}{logical}
+
+\item{scale_control}{logical}
+
+\item{street_view_control}{logical}
+
+\item{rotate_control}{logical}
+
+\item{fullscreen_control}{logical}
 }
 \description{
 Generates a google map object
@@ -38,8 +53,6 @@ In order to use Google Maps you need a valid Google Maps Web JavaScript API key.
 \examples{
 \dontrun{
 
-library(magrittr)  ## for the \%>\% pipes
-
 map_key <- "your_api_key"
 df <- structure(list(lat = c(-37.8201904296875, -37.8197288513184,
 -37.8191299438477, -37.8187675476074, -37.8186187744141, -37.8181076049805
@@ -49,7 +62,6 @@ df <- structure(list(lat = c(-37.8201904296875, -37.8197288513184,
 77.1501972114202), opacity = c(0.2, 0.2, 0.2, 0.2, 0.2, 0.2)), .Names = c("lat",
 "lon", "weight", "opacity"), row.names = 379:384, class = "data.frame")
 
-library(magrittr)
 google_map(key = map_key, data = df_line) \%>\%
  add_markers() \%>\%
  add_heatmap() \%>\%

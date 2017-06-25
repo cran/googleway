@@ -20,10 +20,14 @@
 #' @param padding the padding of the map
 #' @param styles JSON string representation of a valid Google Maps styles Array. See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/styling}
 #' @param search_box \code{boolean} indicating if a search box should be placed on the map
+#' @param zoom_control logical
+#' @param map_type_control logical
+#' @param scale_control logical
+#' @param street_view_control logical
+#' @param rotate_control logical
+#' @param fullscreen_control logical
 #' @examples
 #' \dontrun{
-#'
-#' library(magrittr)  ## for the %>% pipes
 #'
 #' map_key <- "your_api_key"
 #' df <- structure(list(lat = c(-37.8201904296875, -37.8197288513184,
@@ -34,7 +38,6 @@
 #' 77.1501972114202), opacity = c(0.2, 0.2, 0.2, 0.2, 0.2, 0.2)), .Names = c("lat",
 #' "lon", "weight", "opacity"), row.names = 379:384, class = "data.frame")
 #'
-#' library(magrittr)
 #' google_map(key = map_key, data = df_line) %>%
 #'  add_markers() %>%
 #'  add_heatmap() %>%
@@ -59,14 +62,14 @@ google_map <- function(key,
                        height = NULL,
                        padding = 0,
                        styles = NULL,
-                       search_box = FALSE) {
+                       search_box = FALSE,
+                       zoom_control = TRUE,
+                       map_type_control = TRUE,
+                       scale_control = FALSE,
+                       street_view_control = TRUE,
+                       rotate_control = TRUE,
+                       fullscreen_control = TRUE) {
 
-  ## TODO:
-  ## centre map according to data/user location?
-  ## other default location than Melbourne?
-  ## pass data into google_map, and use in the other map_layer() functions
-
-  # key <- read.dcf("~/Documents/.googleAPI", fields = c("GOOGLE_MAP_KEY"))
   if(is.null(location))
     location <- c(-37.9, 144.5)  ## Melbourne, Australia
 
@@ -79,7 +82,13 @@ google_map <- function(key,
     lng = location[2],
     zoom = zoom,
     styles = styles,
-    search_box = search_box
+    search_box = search_box,
+    zoomControl = zoom_control,
+    mapTypeControl = map_type_control,
+    scaleControl = scale_control,
+    streetViewControl = street_view_control,
+    rotateControl = rotate_control,
+    fullscreenControl = fullscreen_control
   )
 
   # create widget
@@ -146,7 +155,7 @@ get_map_data = function(map){
 #' @examples
 #' \dontrun{
 #' library(shiny)
-#' library(magrittr)
+#' library(googleway)
 #'
 #' ui <- fluidPage(google_mapOutput("map"))
 #'

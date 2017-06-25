@@ -1,8 +1,8 @@
 Package: googleway
 Type: Package
 Title: Accesses Google Maps APIs to Retrieve Data and Plot Maps
-Version: 2.0.0
-Date: 2017-04-26
+Version: 2.2.0
+Date: 2017-06-25
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")),
     person("Paulo", "Barcelos", role = "ctb", comment = "Author of c++ decode_pl"),
@@ -23,10 +23,10 @@ BugReports: https://github.com/SymbolixAU/googleway/issues
 Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2017-05-01 12:17:09 UTC; dave
+Packaged: 2017-06-25 04:11:38 UTC; dave
 Author: David Cooley [aut, cre],
   Paulo Barcelos [ctb] (Author of c++ decode_pl),
   Rstudio [ctb] (Functions written for the Leaflet pacakge)
 Maintainer: David Cooley <dcooley@symbolix.com.au>
 Repository: CRAN
-Date/Publication: 2017-05-01 15:16:05 UTC
+Date/Publication: 2017-06-25 07:26:01 UTC

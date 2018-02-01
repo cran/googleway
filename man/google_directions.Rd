@@ -9,12 +9,17 @@ google_directions(origin, destination, mode = c("driving", "walking",
   waypoints = NULL, optimise_waypoints = FALSE, alternatives = FALSE,
   avoid = NULL, units = c("metric", "imperial"), traffic_model = NULL,
   transit_mode = NULL, transit_routing_preference = NULL, language = NULL,
-  region = NULL, key, simplify = TRUE, curl_proxy = NULL)
+  region = NULL, key = get_api_key("directions"), simplify = TRUE,
+  curl_proxy = NULL)
 }
 \arguments{
-\item{origin}{\code{numeric} vector of lat/lon coordinates, or an address string}
+\item{origin}{Origin location as either a one or two column data.frame, a
+list of unnamed elements, each element is either a numeric vector of lat/lon
+coordinates, an address string or a place_id, or a vector of a pair of lat / lon coordinates}
 
-\item{destination}{\code{numeric} vector of lat/lon coordinates, or an address string}
+\item{destination}{destination location as either a one or two column data.frame, a
+list of unnamed elements, each element is either a numeric vector of lat/lon
+coordinates, an address string or place_id, or a vector of a pair of lat / lon coordinates}
 
 \item{mode}{string. One of 'driving', 'walking', 'bicycling' or 'transit'.}
 
@@ -26,11 +31,12 @@ is specified it defaults to \code{Sys.time()}}
 can only specify one of \code{arrival_time} or \code{departure_time}, not both.
 If both are supplied, \code{departure_time} will be used.}
 
-\item{waypoints}{list of waypoints, expressed as either a \code{vector} of
-lat/lon coordinates, or a \code{string} address to be geocoded. Only available
-for driving, walking or bicycling modes. List elements must be named either
-'stop' or 'via', where 'stop' is used to indicate a stopover for a waypoint,
-and 'via' will not stop at the waypoint.
+\item{waypoints}{list of waypoints, expressed as either \code{vectors} of
+lat/lon coordinates, or a \code{string} address to be geocoded, or an encoded
+polyline enclosed by \code{enc:} and \code{:}. Only available for driving,
+walking or bicycling modes. List elements must be named either 'stop' or 'via',
+where 'stop' is used to indicate a stopover for a waypoint, and 'via' will
+not stop at the waypoint.
 See \url{https://developers.google.com/maps/documentation/directions/intro#Waypoints} for details}
 
 \item{optimise_waypoints}{\code{boolean} allow the Directions service to optimize the
@@ -62,7 +68,8 @@ to \code{transit_mode=c("train", "tram", "subway")}}
 transit directions.}
 
 \item{language}{\code{string} - specifies the language in which to return the results.
-See the list of supported languages: \url{https://developers.google.com/maps/faq#using-google-maps-apis} If no langauge is supplied, the service will attempt to use the language of the domain from which the request was sent}
+See the list of supported languages: \url{https://developers.google.com/maps/faq#languagesupport}.
+If no langauge is supplied, the service will attempt to use the language of the domain from which the request was sent}
 
 \item{region}{\code{string} - specifies the region code, specified as a ccTLD
 ("top-level domain"). See region basing for details
@@ -70,7 +77,8 @@ See the list of supported languages: \url{https://developers.google.com/maps/faq
 
 \item{key}{\code{string} - a valid Google Developers Directions API key}
 
-\item{simplify}{\code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string}
+\item{simplify}{\code{logical} - TRUE indicates the returned JSON will be coerced into a list.
+FALSE indicates the returend JSON will be returned as a string}
 
 \item{curl_proxy}{a curl proxy object}
 }
@@ -84,31 +92,42 @@ including transit, driving, walking, or cycling.
 }
 \examples{
 \dontrun{
+
+api_key <- "your_api_key"
 ## using lat/long coordinates
 google_directions(origin = c(-37.8179746, 144.9668636),
           destination = c(-37.81659, 144.9841),
           mode = "walking",
-          key = "<your valid api key>")
+          key = api_key)
 
 
+## set the key so it's available to all function calls
+set_key(key = api_key)
 ## using address string
 google_directions(origin = "Flinders Street Station, Melbourne",
          destination = "MCG, Melbourne",
-         mode = "walking",
-         key = "<your valid api key>")
+         mode = "walking")
 
 
 google_directions(origin = "Melbourne Airport, Australia",
          destination = "Portsea, Melbourne, Australia",
          departure_time =  Sys.time() + (24 * 60 * 60),
-         waypoints = list(c(-37.81659, 144.9841),
+         waypoints = list(stop = c(-37.81659, 144.9841),
                            via = "Ringwood, Victoria"),
          mode = "driving",
          alternatives = FALSE,
          avoid = c("TOLLS", "highways"),
          units = "imperial",
-         key = "<your valid api key>",
          simplify = TRUE)
+
+## waypoints expressed as an encoded polyline
+polyWaypoints <- encode_pl(tram_stops[1:2, c("stop_lat")], tram_stops[1:2, c("stop_lon")])
+polyWaypoints <- list(via = paste0("enc:", polyWaypoints, ":"))
+
+google_directions(origin = "Melbourne Zoo, Melbourne",
+         destination = "Studley Park, Melbourne",
+         waypoints = polyWaypoints)
+
 
 ## using bus and less walking
 google_directions(origin = "Melbourne Airport, Australia",
@@ -117,7 +136,6 @@ google_directions(origin = "Melbourne Airport, Australia",
          mode = "transit",
          transit_mode = "bus",
          transit_routing_preference = "less_walking",
-         key = "<your valid api key>",
          simplify = FALSE)
 
 ## using arrival time
@@ -127,7 +145,6 @@ google_directions(origin = "Melbourne Airport, Australia",
          mode = "transit",
          transit_mode = "bus",
          transit_routing_preference = "less_walking",
-         key = "<your valid api key>",
          simplify = FALSE)
 
 ## return results in French
@@ -138,9 +155,7 @@ google_directions(origin = "Melbourne Airport, Australia",
          transit_mode = "bus",
          transit_routing_preference = "less_walking",
          language = "fr",
-         key = key,
          simplify = FALSE)
 
 }
 }
-

@@ -5,8 +5,8 @@
 \title{Google elevation}
 \usage{
 google_elevation(df_locations = NULL, polyline = NULL,
-  location_type = c("individual", "path"), samples = NULL, key,
-  simplify = TRUE)
+  location_type = c("individual", "path"), samples = NULL,
+  key = get_api_key("elevation"), simplify = TRUE, curl_proxy = NULL)
 }
 \arguments{
 \item{df_locations}{\code{data.frame} of with two columns called 'lat' and 'lon'
@@ -27,6 +27,8 @@ points along the path.}
 \item{key}{\code{string} A valid Google Developers Elevation API key}
 
 \item{simplify}{\code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string}
+
+\item{curl_proxy}{a curl proxy object}
 }
 \value{
 Either list or JSON string of the elevation data
@@ -75,4 +77,3 @@ ggplot(data = df_plot, aes(x = location, y = elevation)) +
 
 
 }
-

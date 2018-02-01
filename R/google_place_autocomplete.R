@@ -28,7 +28,9 @@
 #' components to filter by country only. The country must be passed as a two
 #' character, ISO 3166-1 Alpha-2 compatible country code.
 #' For example: components=country:fr would restrict your results to places within France.
-#' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param simplify \code{logical} - TRUE indicates the returned JSON will be
+#' coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param curl_proxy a curl proxy object
 #' @param key \code{string} A valid Google Developers Places API key
 #'
 #' @examples
@@ -51,7 +53,8 @@ google_place_autocomplete <- function(place_input,
                                       place_type = NULL,
                                       components = NULL,
                                       simplify = TRUE,
-                                      key){
+                                      curl_proxy = NULL,
+                                      key = get_api_key("place_autocomplete")){
 
   ## check input is a valid character string
   if(!is.character(place_input) | length(place_input) > 1)
@@ -59,47 +62,13 @@ google_place_autocomplete <- function(place_input,
 
   place_input <- gsub(" ", "+", place_input)
 
-  LogicalCheck(simplify)
+  logicalCheck(simplify)
 
-  ## check location is valid
-  if(!is.null(location)){
-    if(length(location) != 2 | !is.numeric(location)){
-      stop("location must be a numeric vector of latitude/longitude coordinates")
-    }else{
-      location <- paste0(location, collapse = ",")
-    }
-  }
-
-  ## check radius
-  if(!is.null(radius)){
-    if(!is.numeric(radius) | length(radius) != 1)
-      stop("radius must be a numeric vector of length 1")
-  }
-
-  ## language check
-  if(!is.null(language) & (class(language) != "character" | length(language) > 1))
-    stop("language must be a single character vector or string")
-
-  if(!is.null(language))
-    language <- tolower(language)
-
-  ## check place type
-  if(!is.null(place_type)){
-    if(length(place_type) > 1 | !is.character(place_type))
-      stop("place_type must be a string vector of length 1")
-  }
-
-  # ## check components
-  if(!is.null(components)){
-    if(!is.character(components) | length(components) > 1)
-      stop("components must be a string vector of length 1, and represent an ISO 3166-1 Alpha-2 country code")
-
-    if(nchar(components) != 2)
-      stop("components must be a string vector of length 1, and represent an ISO 3166-1 Alpha-2 country code")
-  }
-
-  if(!is.null(components))
-    components <- paste0("country:", components)
+  location <- validateGeocodeLocation(location)
+  radius <- validateRadius(radius)
+  language <- validateLanguage(language)
+  place_type <- validatePlaceType(place_type)
+  components <- validateComponentsCountries(components)
 
   map_url <- "https://maps.googleapis.com/maps/api/place/autocomplete/json?"
 
@@ -111,6 +80,6 @@ google_place_autocomplete <- function(place_input,
                                      "components" = components,
                                      "key" = key))
 
-  return(fun_download_data(map_url, simplify))
+  return(downloadData(map_url, simplify, curl_proxy))
 
 }

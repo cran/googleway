@@ -22,6 +22,7 @@
 #' points along the path.
 #' @param key \code{string} A valid Google Developers Elevation API key
 #' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the elevation data
 #' @examples
 #' \dontrun{
@@ -61,8 +62,9 @@ google_elevation <- function(df_locations = NULL,
                              polyline = NULL,
                              location_type = c("individual","path"),
                              samples = NULL,
-                             key,
-                             simplify = TRUE
+                             key = get_api_key("elevation"),
+                             simplify = TRUE,
+                             curl_proxy = NULL
                              ){
 
   if(!is.null(df_locations) & !is.null(polyline))
@@ -100,12 +102,12 @@ google_elevation <- function(df_locations = NULL,
   ## check location_type
   location_type <- match.arg(location_type)
 
-  LogicalCheck(simplify)
+  logicalCheck(simplify)
 
   ## check samples
 
   if(location_type == "path" & !is.numeric(samples)){
-    warning("samples has not been specified. 3 will be used")
+    message("samples has not been specified. 3 will be used")
     samples <- 3
   }else if(location_type != "path"){
     samples <- NULL
@@ -128,14 +130,14 @@ google_elevation <- function(df_locations = NULL,
 
   if(nchar(map_url) > 8192)
     if(is.null(polyline)){
-      warning(paste0("The length of the API query has exceeded 8192 characters and your request may not work ",
+      stop(paste0("The length of the API query has exceeded 8192 characters and your request may not work ",
                    "(see documentation https://developers.google.com/maps/documentation/elevation/intro#Locations for details",
                    "\nTry reducing the number of coordinates, or using an encoded polyline in the 'polyline' argument"))
     }else{
-      warning(paste0("The length of the API query has exceeded 8192 characters and your request may not work ",
+      stop(paste0("The length of the API query has exceeded 8192 characters and your request may not work ",
                      "(see documentation https://developers.google.com/maps/documentation/elevation/intro#Locations for details",
                      "\nConsider decoding your polyline into coordinates, then sending subsets of the data into the elevation function."))
     }
 
-  return(fun_download_data(map_url, simplify))
+  return(downloadData(map_url, simplify, curl_proxy))
 }

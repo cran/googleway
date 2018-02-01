@@ -9,7 +9,7 @@
 #' returns an image 600 pixles wide and 400 pixles high.
 #' @param heading indicates the compass heading of the camera. Accepted values are
 #' from 0 to 360 (both 0 and 360 indicate north), 90 indicates east, 180 south and 270 west.
-#' If no heading is specified a value will be calculated that directs teh camera
+#' If no heading is specified a value will be calculated that directs the camera
 #' to wards the specified \code{location}, from the point at which the closest
 #' photograph was taken.
 #' @param fov determines the horizontal field of view of the image. The field of
@@ -83,7 +83,7 @@ google_streetview <- function(location = NULL,
                               output = c("plot","html"),
                               response_check = FALSE,
                               signature = NULL,
-                              key){
+                              key = get_api_key("streetview")){
 
 
   if(is.null(location) & is.null(panorama_id))
@@ -93,39 +93,16 @@ google_streetview <- function(location = NULL,
     stop("please provide one of location or panorama_id")
 
   if(!is.null(location)){
-    location <- fun_check_location(location, "location")
+    location <- check_location(location, "location")
   }
 
-  LogicalCheck(response_check)
-
+  logicalCheck(response_check)
   output <- match.arg(output)
 
-  if(!is.null(heading)){
-    if(length(heading) != 1)
-      stop("heading must be a single value")
-
-    if(!is.numeric(heading) | heading < 0 | heading > 360){
-      stop("heading must be a numeric value between 0 and 360 (inclusive)")
-    }
-  }
-
-  if(length(fov) != 1)
-    stop("fov must be a single value")
-
-  if(!is.numeric(fov) | fov < 0 | fov > 120)
-    stop("fov must be a numeric value between 0 and 120 (inclusive)")
-
-  if(!is.numeric(size) | length(size) != 2)
-    stop("size must be a numeric vector of length 2, giving the width and height (in pixles) of the image")
-
-  size <- paste0(size, collapse = "x")
-
-  if(length(pitch) != 1)
-    stop("pitch must be a single value")
-
-  if(!is.numeric(pitch) | pitch < -90 | pitch > 90){
-    stop("pitch must be between -90 and 90 (inclusive)")
-  }
+  heading <- validateHeading(heading)
+  fov <- validateFov(fov)
+  size <- validateSize(size)
+  pitch <- validatePitch(pitch)
 
   if(response_check){
     ## test for imagry

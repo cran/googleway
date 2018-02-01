@@ -4,8 +4,9 @@
 \alias{google_geocode}
 \title{Google geocoding}
 \usage{
-google_geocode(address, bounds = NULL, key, language = NULL,
-  region = NULL, components = NULL, simplify = TRUE)
+google_geocode(address, bounds = NULL, key = get_api_key("geocode"),
+  language = NULL, region = NULL, components = NULL, simplify = TRUE,
+  curl_proxy = NULL)
 }
 \arguments{
 \item{address}{\code{string}. The street address that you want to geocode, in the
@@ -31,6 +32,8 @@ the results to a specific area. One or more of "route","locality","administrativ
 "postal_code","country"}
 
 \item{simplify}{\code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string}
+
+\item{curl_proxy}{a curl proxy object}
 }
 \value{
 Either list or JSON string of the geocoded address
@@ -70,4 +73,3 @@ df <- google_geocode(address = "Flinders Street Station",
 
 }
 }
-

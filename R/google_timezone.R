@@ -14,7 +14,9 @@
 #' If no langauge is supplied, the service will attempt to use the language of
 #' the domain from which the request was sent.
 #' @param key \code{string} A valid Google Developers Timezone API key.
-#' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param simplify \code{logical} - TRUE indicates the returned JSON will be
+#' coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the timezone
 #' @examples
 #' \dontrun{
@@ -28,17 +30,12 @@ google_timezone <- function(location,
                             timestamp = Sys.time(),
                             language = NULL,
                             simplify = TRUE,
-                            key
+                            curl_proxy = NULL,
+                            key = get_api_key("timezone")
                             ){
 
-  ## check location
-  if(!is.numeric(location))
-    stop("location must be a vector of a pair of latitude and longitude coordinates")
 
-  if(!length(location) == 2)
-    stop("location must be a vector of a pair of latitude and longitude coordinates")
-
-  location <- paste0(location, collapse = ",")
+  location <- validateGeocodeLocation(location)
 
   ## check timestamp
   if(!inherits(timestamp, "POSIXct") | length(timestamp) != 1)
@@ -46,14 +43,8 @@ google_timezone <- function(location,
 
   timestamp <- as.integer(timestamp)
 
-  ## language check
-  if(!is.null(language) & (class(language) != "character" | length(language) > 1))
-    stop("language must be a single character vector or string")
-
-  if(!is.null(language))
-    language <- tolower(language)
-
-  LogicalCheck(simplify)
+  language <- validateLanguage(language)
+  logicalCheck(simplify)
 
   map_url <- "https://maps.googleapis.com/maps/api/timezone/json?"
 
@@ -62,6 +53,6 @@ google_timezone <- function(location,
                                      "language" = language,
                                      "key" = key))
 
-  return(fun_download_data(map_url, simplify))
+  return(downloadData(map_url, simplify, curl_proxy))
 
 }

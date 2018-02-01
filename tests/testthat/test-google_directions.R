@@ -1,5 +1,15 @@
 context("Google directions")
 
+## issue 65
+test_that("url encoded correctly", {
+
+  expect_equal(
+    URLencode("https://www.google.com/&avoid=highways|tolls"),
+    "https://www.google.com/&avoid=highways%7Ctolls"
+  )
+
+})
+
 
 test_that("incorrect mode throws error", {
   skip("incorrect error string in match.arg")
@@ -62,11 +72,13 @@ test_that("Avoid is a valid type", {
 
 test_that("Departure time is not in the past",{
 
-  expect_error(google_directions(origin = c(-37.8179746, 144.9668636),
+  expect_error(
+    google_directions(origin = c(-37.8179746, 144.9668636),
                          destination = c(-37.81659, 144.9841),
                          departure_time = as.POSIXct("2015-01-01"),
                          key = "abc",
-                         simplify = TRUE))
+                         simplify = TRUE)
+    )
 
 })
 
@@ -155,6 +167,7 @@ test_that("waypoints are optimised", {
 
 test_that("transit_routing_preferences are valid",{
 
+
   expect_error(
     google_directions(origin = "Melbourne Airport, Australia",
                       destination = "Portsea, Melbourne, Australia",
@@ -164,7 +177,11 @@ test_that("transit_routing_preferences are valid",{
                       transit_routing_preference = 'less walking',
                       key = "abc")
   )
+})
 
+test_that("routing preferences are valid2", {
+
+  skip("call to api")
 
   expect_silent(
     google_directions(origin = "Melbourne Airport, Australia",
@@ -191,13 +208,41 @@ test_that("transit_routing_preferences are valid",{
 
 test_that("traffic model is valid",{
 
-  expect_error(
-    google_directions(origin = "Melbourne Airport, Australia",
+  skip("request to api")
+
+  d <- google_directions(origin = "Melbourne Airport, Australia",
                       destination = "Portsea, Melbourne, Australia",
                       departure_time = Sys.time() + (24 * 60 * 60),
                       traffic_model = "best guess",
                       key = "abc")
-  )
+
+  expect_true(d$status == "REQUEST_DENIED")
+
+  d <- google_directions(origin = "Melbourne Airport, Australia",
+                    destination = "Portsea, Melbourne, Australia",
+                    departure_time = Sys.time() + (24 * 60 * 60),
+                    traffic_model = "best_guess",
+                    key = "abc")
+
+  expect_true(d$status == "REQUEST_DENIED")
+
+  ## depature time is set if omitted
+  d <- google_directions(origin = "Melbourne Airport, Australia",
+                    destination = "Portsea, Melbourne, Australia",
+                    traffic_model = "best_guess",
+                    key = "abc")
+
+  expect_true(d$status == "REQUEST_DENIED")
+
+  origin <- "ChIJFzmq66lZ1moRkPAvBXZWBA8" # melbourne airport
+  destination <- "ChIJUZN5TAg21GoRQOWMIXVWBAU" # protsea
+
+  d <- google_directions(origin = origin,
+                         destination = destination,
+                         traffic_model = "best_guess",
+                         key = 'abc')
+
+  expect_true(d$status == "REQUEST_DENIED")
 
 })
 

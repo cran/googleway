@@ -5,6 +5,16 @@ test_that("google map update not called from static R session", {
 })
 
 
+test_that("google_map_update errors outside shiny", {
+
+  m <- google_map(key = "abc")
+  expect_error(
+    google_map_update(m),
+    "google_map_update must be called from the server function of a Shiny app"
+  )
+
+})
+
 
 test_that("invoke_remote stops on invalid map parameter", {
 
@@ -34,8 +44,11 @@ test_that("formula resolves", {
     "Unexpected two-sided formula: x ~ y"
   )
 
-
-
+  f <- formula(~"col")
+  df <- data.frame(col = 1)
+  expect_true(
+    googleway:::resolveFormula(f, data = df) == "col"
+  )
 })
 
 test_that("google_map_update exists",{
@@ -49,17 +62,17 @@ test_that("google_map_update exists",{
 test_that("layer_id set to default", {
 
   expect_equal(
-    googleway:::LayerId(NULL),
+    googleway:::layerId(NULL),
     "defaultLayerId"
   )
 
   expect_error(
-    googleway:::LayerId(c(1,2)),
+    googleway:::layerId(c(1,2)),
     "please provide a single value for 'layer_id'"
   )
 
   expect_equal(
-    googleway:::LayerId(1),
+    googleway:::layerId(1),
     1
   )
 
@@ -76,5 +89,19 @@ test_that("map styles defined correctly", {
 
 })
 
+test_that("constructWaypoints works", {
 
+  waypoints <- list(c(-37, 144))
+
+  expect_true(
+    googleway:::constructWaypoints(waypoints, FALSE) == "-37,144"
+  )
+
+  waypoints <- list(via = c(-37, 144))
+  expect_true(
+    googleway:::constructWaypoints(waypoints, FALSE) == "via:-37,144"
+  )
+
+
+})
 

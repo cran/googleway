@@ -8,7 +8,7 @@ test_that("markers correctly defined", {
   df <- data.frame(mylat = 1:4,
                    mylon = 1:4)
 
-  expect_error(add_markers(map = m), "Couldn't infer latitude column for add_markers")
+#  expect_error(add_markers(map = m), "No data supplied") ## no longer relevent
   expect_error(add_markers(map = m, data = df), "Couldn't infer latitude column for add_markers")
 
 
@@ -52,6 +52,30 @@ test_that("markers correctly defined", {
 
 })
 
+test_that("marker exmaples work", {
+
+  map_key <- "api"
+
+  ## map specifying lat & lon, and using defaults for opacity and colour
+  g <- google_map(key = map_key, data = tram_stops[1, ]) %>%
+    add_markers(lat = "stop_lat", lon = "stop_lon", info_window = "stop_name")
+
+  expectedDf <- data.frame(lat = tram_stops[1, "stop_lat"],
+                           lng = tram_stops[1, "stop_lon"],
+                           info_window = tram_stops[1, "stop_name"],
+                           opacity = googleway:::markerDefaults(1)[, 'opacity'],
+                           colour = googleway:::markerDefaults(1)[, 'colour'],
+                           stringsAsFactors = F)
+
+  expect_equal(
+    expectedDf,
+    jsonlite::fromJSON(g$x$calls[[1]]$args[[1]])
+  )
+})
+
+
+
+
 test_that("clear markers invoked", {
 
   df <- data.frame(lat = 1:4,
@@ -82,52 +106,6 @@ test_that("update styles correctly invoked", {
 })
 
 
-test_that("circles correctly defined", {
-
-  m <- google_map(key = "abc")
-
-  df <- data.frame(mylat = 1:4,
-                   mylon = 1:4)
-
-  expect_error(add_circles(map = m, data = df), "Couldn't infer latitude column for add_circles")
-  expect_error(add_circles(map = m, data = df), "Couldn't infer latitude column for add_circles")
-
-  df <- data.frame(lat = 1:4,
-                   lon = 1:4,
-                   info_window = letters[1:4],
-                   mouse_over = letters[1:4])
-
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$stroke_colour) == "#FF0000")
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$stroke_weight) == 1)
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$stroke_opacity) == 0.8)
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$radius) == 50)
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$fill_colour) == "#FF0000")
-  expect_true(unique(jsonlite::fromJSON(add_circles(map = m, data = df)$x$calls[[1]]$args[[1]])$fill_opacity) == 0.35)
-
-  expect_true("info_window" %in% names(jsonlite::fromJSON(add_circles(map = m, data = df, info_window = "info_window")$x$calls[[1]]$args[[1]])))
-  expect_true("mouse_over" %in% names(jsonlite::fromJSON(add_circles(map = m, data = df, mouse_over = "mouse_over")$x$calls[[1]]$args[[1]])))
-
-})
-
-test_that("update circles defined", {
-
-  m <- google_map(key = "abc")
-  df <- data.frame(id = 1:4)
-  expect_silent(update_circles(map = m, data = df))
-
-})
-
-test_that("clear markers circles", {
-
-  df <- data.frame(lat = 1:4,
-                   lon = 1:4)
-
-  m <- google_map(key = "abc") %>% add_circles(data = df)
-
-  expect_true(clear_circles(m)$x$calls[[2]]$functions == "clear_circles")
-
-})
-
 
 
 test_that("heatmap correctly defined", {
@@ -157,7 +135,7 @@ test_that("heatmap correctly defined", {
 
   expect_true(
     add_heatmap(m, data = df, option_gradient = c("red", "blue"))$x$calls[[1]]$args[[1]] ==
-      '[{"lat":1,"lng":1,"weight":1},{"lat":2,"lng":2,"weight":1},{"lat":3,"lng":3,"weight":1},{"lat":4,"lng":4,"weight":1}]'
+      '[{"lat":1,"lng":1,"fill_colour":1},{"lat":2,"lng":2,"fill_colour":1},{"lat":3,"lng":3,"fill_colour":1},{"lat":4,"lng":4,"fill_colour":1}]'
   )
 
   expect_true(
@@ -202,104 +180,6 @@ test_that("layers added and removed", {
 })
 
 
-test_that("polylines added and removed", {
-
-  ##  poylline column
-  m <- google_map(key = "abc")
-  df <- data.frame(lat = 1:4,
-                  lon = 1:4,
-                  polyline = letters[1:4],
-                  info_window = letters[1:4],
-                  mouse_over = letters[1:4])
-
-  expect_error(
-    add_polylines(m),
-    'please supply the either the column containing the polylines, or the lat/lon coordinate columns'
-    )
-
-  df$id <- 1:nrow(df)
-  expect_silent(add_polylines(map = m, data = df, id = 'id', lat = 'lat', lon = 'lon'))
-
-  x <- add_polylines(map = m, data = df, id = 'id', lat = 'lat', lon = 'lon')
-  js <- x$x$calls[[1]]$args[[1]]
-
-  expect_equal(
-    as.character(js),
-    '[{"coords":[{"lat":1,"lng":1}],"geodesic":true,"stroke_colour":"#0000FF","stroke_weight":2,"stroke_opacity":0.6,"z_index":3,"id":"1"},{"coords":[{"lat":2,"lng":2}],"geodesic":true,"stroke_colour":"#0000FF","stroke_weight":2,"stroke_opacity":0.6,"z_index":3,"id":"2"},{"coords":[{"lat":3,"lng":3}],"geodesic":true,"stroke_colour":"#0000FF","stroke_weight":2,"stroke_opacity":0.6,"z_index":3,"id":"3"},{"coords":[{"lat":4,"lng":4}],"geodesic":true,"stroke_colour":"#0000FF","stroke_weight":2,"stroke_opacity":0.6,"z_index":3,"id":"4"}]'
-    )
-
-  expect_message(
-    add_polylines(map = m, data = df, lat = 'lat', lon = 'lon'),
-    "No 'id' value defined, assuming one continuous line of coordinates"
-  )
-
-
-
-  expect_true(unique(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$geodesic) == TRUE)
-  expect_true(unique(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_colour) == "#0000FF")
-  expect_true(unique(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_weight) == 2)
-  expect_true(unique(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_opacity) == 0.6)
-
-  expect_true("info_window" %in% names(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline", info_window = "info_window")$x$calls[[1]]$args[[1]])))
-  expect_true("mouse_over" %in% names(jsonlite::fromJSON(add_polylines(map = m, data = df, polyline = "polyline", mouse_over = "mouse_over")$x$calls[[1]]$args[[1]])))
-
-  expect_true(clear_polylines(m)$x$calls[[1]]$functions == "clear_polylines")
-
-  expect_error(
-    add_polylines(map = m, data = df, polyline = 'polyline', lat = 'lat', lon = 'lon'),
-    'please use either a polyline colulmn, or lat/lon coordinate columns, not both'
-  )
-
-  ## lat/lon column
-  # add_polylines(map = m, data = df, lat = 'lat', lon = 'lon')
-
-})
-
-
-test_that("polygons added and removed", {
-
-  m <- google_map(key = "abc")
-  df <- data.frame(lat = 1:4,
-                   lon = 1:4,
-                   polyline = letters[1:4],
-                   info_window = letters[1:4],
-                   mouse_over = letters[1:4])
-
-  expect_error(add_polygons(m))
-
-  expect_true(unique(jsonlite::fromJSON(add_polygons(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_colour) == "#0000FF")
-  expect_true(unique(jsonlite::fromJSON(add_polygons(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_weight) == 1)
-  expect_true(unique(jsonlite::fromJSON(add_polygons(map = m, data = df, polyline = "polyline")$x$calls[[1]]$args[[1]])$stroke_opacity) == 0.6)
-
-  expect_true("info_window" %in% names(jsonlite::fromJSON(add_polygons(map = m, data = df, polyline = "polyline", info_window = "info_window")$x$calls[[1]]$args[[1]])))
-  expect_true("mouse_over" %in% names(jsonlite::fromJSON(add_polygons(map = m, data = df, polyline = "polyline", mouse_over = "mouse_over")$x$calls[[1]]$args[[1]])))
-
-  m <- google_map(key = "abc")
-  df <- data.frame(lat = 1:4,
-                   lon = 1:4,
-                   id = 1,
-                   polyline = letters[1:4],
-                   info_window = letters[1:4],
-                   mouse_over = letters[1:4])
-
-  expect_message(
-    add_polygons(map = m, data = df, lat = 'lat', lon = 'lon'),
-    "No 'id' value defined, assuming one continuous line of coordinates"
-  )
-
-  expect_message(
-    add_polygons(map = m, data = df, lat = 'lat', lon = 'lon', id = 'id'),
-    "No 'pathId' value defined, assuming one continuous line per polygon"
-  )
-
-  expect_true(
-    add_polygons(map = m, data = df, lat = 'lat', lon = 'lon', id = 'id')$x$calls[[1]]$args[[1]] ==
-    '[{"coords":[[{"lat":1,"lng":1},{"lat":2,"lng":2},{"lat":3,"lng":3},{"lat":4,"lng":4}]],"stroke_colour":"#0000FF","stroke_weight":1,"stroke_opacity":0.6,"fill_colour":"#FF0000","fill_opacity":0.35,"z_index":1,"id":"1"}]'
-  )
-
-  expect_true(clear_polygons(m)$x$calls[[1]]$functions == "clear_polygons")
-
-})
 
 test_that("map overlays coordinates are accurate", {
 
@@ -323,5 +203,68 @@ test_that("map overlays coordinates are accurate", {
                              overlay_url = "https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg")
   )
 
+  g <- google_map(key = 'abc') %>%
+    add_overlay(north = 40.773941, south = 40.712216, east = -74.12544, west = -74.22655,
+                overlay_url = "https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg")
+
+  expect_true(
+    sum(class(g) == c("google_map", "htmlwidget")) == 2
+  )
+
 })
+
+
+
+test_that("map layer parameter checks work", {
+
+
+  ## Drawing
+  g <- google_map(key = 'abc') %>%
+    add_drawing()
+
+  expect_true(
+    sum(class(g) == c("google_map", "htmlwidget")) == 2
+  )
+
+  g <- google_map(key = 'abc') %>%
+    clear_drawing()
+
+  expect_true(
+    sum(class(g) == c("google_map", "htmlwidget")) == 2
+  )
+
+
+  ## Rectangles
+  df <- data.frame(north = 33.685, south = 33.671, east = -116.234, west = -116.251)
+
+  m <- google_map(key = "abc")
+  r <- add_rectangles(m, data = df, north = "north", south = "south", east = "east", west = "west")
+
+  expect_true(r$x$calls[[1]]$functions == "add_rectangles")
+  expect_true(r$x$calls[[1]]$args[[1]] == '[{"north":33.685,"east":-116.234,"south":33.671,"west":-116.251,"stroke_colour":"#FF0000","stroke_weight":1,"stroke_opacity":0.8,"fill_opacity":0.35,"fill_colour":"#FF0000","z_index":2}]')
+
+})
+
+
+test_that("drag drop geojson invoked", {
+
+  m <- google_map(key = 'abc') %>%
+    add_dragdrop()
+
+  expect_true(
+    m$x$calls[[1]]$functions == "drag_drop_geojson"
+  )
+
+})
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1,11 +1,14 @@
+
+## TODO:
+## - plot bbox as rectangle (if requested?)
+
 #' @useDynLib googleway
-#' @importFrom Rcpp evalCpp
+#' @importFrom Rcpp sourceCpp
 #' @importFrom jsonlite fromJSON
 #' @importFrom curl curl
 #' @importFrom grDevices col2rgb
 #' @importFrom stats setNames
 NULL
-
 
 #' Pipe
 #'
@@ -27,8 +30,6 @@ NULL
 #' }
 NULL
 
-## build notes
-# --use-valgrind
 directions_data <- function(base_url,
                             information_type = c("directions","distance"),
                             origin,
@@ -50,143 +51,46 @@ directions_data <- function(base_url,
                             simplify = TRUE,
                             curl_proxy = NULL){
 
-  ## parameter check
   if(is.null(key))
     stop("A Valid Google Developers API key is required")
 
   mode <- match.arg(mode)
   units <- match.arg(units)
-  # traffic_model <- match.arg(traffic_model)
 
-  LogicalCheck(simplify)
+  logicalCheck(simplify)
+  avoid <- validateAvoid(avoid)
 
-  ## transit_mode is only valid where mode = transit
-  if(!is.null(transit_mode) & mode != "transit"){
-    warning("You have specified a transit_mode, but are not using mode = 'transit'. Therefore this argument will be ignored")
-    transit_mode <- NULL
-  }else if(!is.null(transit_mode) & mode == "transit"){
-    transit_mode <- match.arg(transit_mode, choices = c("bus","subway","train","tram","rail"))
-  }
+  transit_mode <- validateTransitMode(transit_mode, mode)
+  transit_routing_preference <- validateTransitRoutingPreference(transit_routing_preference, mode)
 
-  ## transit_routing_preference only valid where mode == transit
-  if(!is.null(transit_routing_preference) & mode != "transit"){
-    warning("You have specified a transit_routing_preference, but are not using mode = 'transit'. Therefore this argument will be ignored")
-    transit_routing_preference <- NULL
-  }else if(!is.null(transit_routing_preference) & mode == "transit"){
-    transit_routing_preference <- match.arg(transit_routing_preference, choices = c("less_walking","fewer_transfers"))
-    transit_routing_preference <- paste0(transit_routing_preference, collapse = "|")
-  }
+  departure_time <- validateDepartureTime(departure_time)
 
-  ## check avoid is valid
-  if(!all(tolower(avoid) %in% c("tolls","highways","ferries","indoor")) & !is.null(avoid)){
-    stop("avoid can only include tolls, highways, ferries or indoor")
-  }else{
-    if(length(avoid) > 1){
-      avoid <- paste0(tolower(avoid), collapse = "+")
-    }else{
-      avoid <- tolower(avoid)
-    }
-  }
+  arrival_time <- validateArrivalTime(arrival_time)
+  arrival_time <- validateArrivalDepartureTimes(arrival_time, departure_time)
 
-  ## check departure time is valid
-  if(!is.null(departure_time) & !inherits(departure_time, "POSIXct"))
-    stop("departure_time must be a POSIXct object")
+  alternatives <- validateAlternatives(alternatives)
 
-  if(!is.null(departure_time)){
-    if(departure_time < Sys.time()){
-      stop("departure_time must not be in the past")
-    }
-  }
-
-  ## check arrival time is valid
-  if(!is.null(arrival_time) & !inherits(arrival_time, "POSIXct"))
-    stop("arrival_time must be a POSIXct object")
-
-  if(!is.null(arrival_time) & !is.null(departure_time)){
-    warning("you have supplied both an arrival_time and a departure_time - only one is allowed. The arrival_time will be ignored")
-    arrival_time <- NULL
-  }
-
-  ## check alternatives is valid
-  LogicalCheck(alternatives)
-
-  if(!is.null(alternatives))
-    alternatives <- tolower(alternatives)
-
-  ## check traffic model is valid
   if(!is.null(traffic_model) & is.null(departure_time))
-    stop("traffic_model is only accepted with a valid departure_time")
+    departure_time <- Sys.time()
 
-  if(!is.null(traffic_model)){
-    traffic_model <- match.arg(traffic_model, choices = c("best_guess", "pessimistic","optimistic"))
-  }
+  traffic_model <- validateTrafficModel(traffic_model)
 
   ## check origin/destinations are valid
   if(information_type == "directions"){
-    origin <- fun_check_location(origin, "Origin")
-    destination <- fun_check_location(destination, "Destination")
+    origin <- check_location(origin, "Origin")
+    destination <- check_location(destination, "Destination")
   }else if(information_type == "distance"){
-    origin <- fun_check_multiple_locations(origin, "Origins elements")
-    destination <- fun_check_multiple_locations(destination, "Destinations elements")
+    origin <- check_multiple_locations(origin, "Origins elements")
+    destination <- check_multiple_locations(destination, "Destinations elements")
   }
 
-  ## check departure time is valid
+  ## times as integers
   departure_time <- ifelse(is.null(departure_time), as.integer(Sys.time()), as.integer(departure_time))
   arrival_time <- as.integer(arrival_time)
 
-  ## check waypoints are valid
-  if(!is.null(waypoints) & !mode %in% c("driving", "walking","bicycling"))
-    stop("waypoints are only valid for driving, walking or bicycling modes")
-
-  if(!is.null(waypoints) & class(waypoints) != "list")
-    stop("waypoints must be a list")
-
-  if(!is.null(waypoints) & !all(names(waypoints) %in% c("stop", "via")))
-    stop("waypoint list elements must be named either 'via' or 'stop'")
-
-  ## check if waypoints should be optimised, and thefore only use 'stop' as a valid waypoint
-  if(optimise_waypoints == TRUE){
-    if(any(names(waypoints) %in% c("via")))
-      stop("waypoints can only be optimised for stopovers. Each waypoint in the list must be named as stop")
-  }
-
-  if(!is.null(waypoints)){
-    ## construct waypoint string
-    # waypoints <- paste0(lapply(waypoints, function(x) fun_check_waypoints(x)), collapse = "|")
-
-    waypoints <- sapply(1:length(waypoints), function(x) {
-      if(length(names(waypoints)) > 0){
-        if(names(waypoints)[x] == "via"){
-          paste0("via:", fun_check_location(waypoints[[x]]))
-        }else{
-          ## 'stop' is the default in google, and the 'stop' identifier is not needed
-          fun_check_location(waypoints[[x]])
-        }
-      }else{
-        fun_check_location(waypoints[[x]])
-      }
-    })
-
-    if(optimise_waypoints == TRUE){
-      waypoints <- paste0("optimize:true|", paste0(waypoints, collapse = "|"))
-    }else{
-      waypoints <- paste0(waypoints, collapse = "|")
-    }
-  }
-
-  ## language check
-  if(!is.null(language) & (class(language) != "character" | length(language) > 1))
-    stop("language must be a single character vector or string")
-
-  if(!is.null(language))
-    language <- tolower(language)
-
-  ## region check
-  if(!is.null(region) & (class(region) != "character" | length(region) > 1))
-    stop("region must be a two-character string")
-
-  if(!is.null(region))
-    region <- tolower(region)
+  waypoints <- validateWaypoints(waypoints, optimise_waypoints, mode)
+  language <- validateLanguage(language)
+  region <- validateRegion(region)
 
   ## construct url
   if(information_type == "directions"){
@@ -202,6 +106,7 @@ directions_data <- function(base_url,
             "alternatives" = alternatives,
             "avoid" = avoid,
             "units" = units,
+            "traffic_model" = traffic_model,
             "mode" = mode,
             "transit_mode" = transit_mode,
             "transit_routing_preference" = transit_routing_preference,
@@ -214,12 +119,12 @@ directions_data <- function(base_url,
   if(length(map_url) > 1)
     stop("invalid map_url")
 
-  return(fun_download_data(map_url, simplify, curl_proxy))
+  return(downloadData(map_url, simplify, curl_proxy))
 
 }
 
 
-fun_download_data <- function(map_url, simplify, curl_proxy = NULL){
+downloadData <- function(map_url, simplify, curl_proxy = NULL){
 
   out <- NULL
   ## check map_url is valid
@@ -256,34 +161,5 @@ fun_download_data <- function(map_url, simplify, curl_proxy = NULL){
     })
   }
   return(out)
-}
-
-
-fun_check_multiple_locations <- function(loc, type){
-  loc <- sapply(1:length(loc), function(x) {
-    fun_check_location(loc[[x]], type)
-  })
-  loc <- paste0(loc, collapse = "|")
-}
-
-
-fun_check_location <- function(loc, type){
-  if(is.numeric(loc) & length(loc) == 2){
-    loc <- paste0(loc, collapse = ",")
-  }else if(is.character(loc) & length(loc) == 1){
-    loc <- gsub(" ", "+", loc)
-  }else{
-    stop(paste0(type, " must be either a numeric vector of lat/lon coordinates, or an address string"))
-  }
-  return(loc)
-}
-
-fun_check_address <- function(address){
-  if(is.character(address) & length(address) == 1){
-    address <- gsub(" ", "+", address)
-  }else{
-    stop("address must be a string of length 1")
-  }
-  return(address)
 }
 

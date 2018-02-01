@@ -4,8 +4,12 @@
 #' locations. You can search for directions for several modes of transportation,
 #' including transit, driving, walking, or cycling.
 #'
-#' @param origin  \code{numeric} vector of lat/lon coordinates, or an address string
-#' @param destination \code{numeric} vector of lat/lon coordinates, or an address string
+#' @param origin Origin location as either a one or two column data.frame, a
+#' list of unnamed elements, each element is either a numeric vector of lat/lon
+#' coordinates, an address string or a place_id, or a vector of a pair of lat / lon coordinates
+#' @param destination destination location as either a one or two column data.frame, a
+#' list of unnamed elements, each element is either a numeric vector of lat/lon
+#' coordinates, an address string or place_id, or a vector of a pair of lat / lon coordinates
 #' @param mode string. One of 'driving', 'walking', 'bicycling' or 'transit'.
 #' @param departure_time  \code{POSIXct}. Specifies the desired time of departure.
 #' Must be in the future (i.e. greater than \code{sys.time()}). If no value
@@ -13,11 +17,12 @@
 #' @param arrival_time \code{POSIXct}. Specifies the desired time of arrival. Note you
 #' can only specify one of \code{arrival_time} or \code{departure_time}, not both.
 #' If both are supplied, \code{departure_time} will be used.
-#' @param waypoints list of waypoints, expressed as either a \code{vector} of
-#' lat/lon coordinates, or a \code{string} address to be geocoded. Only available
-#' for driving, walking or bicycling modes. List elements must be named either
-#' 'stop' or 'via', where 'stop' is used to indicate a stopover for a waypoint,
-#' and 'via' will not stop at the waypoint.
+#' @param waypoints list of waypoints, expressed as either \code{vectors} of
+#' lat/lon coordinates, or a \code{string} address to be geocoded, or an encoded
+#' polyline enclosed by \code{enc:} and \code{:}. Only available for driving,
+#' walking or bicycling modes. List elements must be named either 'stop' or 'via',
+#' where 'stop' is used to indicate a stopover for a waypoint, and 'via' will
+#' not stop at the waypoint.
 #' See \url{https://developers.google.com/maps/documentation/directions/intro#Waypoints} for details
 #' @param optimise_waypoints \code{boolean} allow the Directions service to optimize the
 #' provided route by rearranging the waypoints in a more efficient order.
@@ -41,41 +46,54 @@
 #' 'fewer_transfers'. specifies preferences for transit routes. Only valid for
 #' transit directions.
 #' @param language \code{string} - specifies the language in which to return the results.
-#' See the list of supported languages: \url{https://developers.google.com/maps/faq#using-google-maps-apis} If no langauge is supplied, the service will attempt to use the language of the domain from which the request was sent
+#' See the list of supported languages: \url{https://developers.google.com/maps/faq#languagesupport}.
+#' If no langauge is supplied, the service will attempt to use the language of the domain from which the request was sent
 #' @param region \code{string} - specifies the region code, specified as a ccTLD
 #' ("top-level domain"). See region basing for details
 #' \url{https://developers.google.com/maps/documentation/directions/intro#RegionBiasing}
 #' @param key \code{string} - a valid Google Developers Directions API key
-#' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
+#' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list.
+#' FALSE indicates the returend JSON will be returned as a string
 #' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the route between origin and destination
 #' @examples
 #' \dontrun{
+#'
+#' api_key <- "your_api_key"
 #' ## using lat/long coordinates
 #' google_directions(origin = c(-37.8179746, 144.9668636),
 #'           destination = c(-37.81659, 144.9841),
 #'           mode = "walking",
-#'           key = "<your valid api key>")
+#'           key = api_key)
 #'
 #'
-#'## using address string
-#'google_directions(origin = "Flinders Street Station, Melbourne",
+#' ## set the key so it's available to all function calls
+#' set_key(key = api_key)
+#' ## using address string
+#' google_directions(origin = "Flinders Street Station, Melbourne",
 #'          destination = "MCG, Melbourne",
-#'          mode = "walking",
-#'          key = "<your valid api key>")
+#'          mode = "walking")
 #'
 #'
-#'google_directions(origin = "Melbourne Airport, Australia",
+#' google_directions(origin = "Melbourne Airport, Australia",
 #'          destination = "Portsea, Melbourne, Australia",
 #'          departure_time =  Sys.time() + (24 * 60 * 60),
-#'          waypoints = list(c(-37.81659, 144.9841),
+#'          waypoints = list(stop = c(-37.81659, 144.9841),
 #'                            via = "Ringwood, Victoria"),
 #'          mode = "driving",
 #'          alternatives = FALSE,
 #'          avoid = c("TOLLS", "highways"),
 #'          units = "imperial",
-#'          key = "<your valid api key>",
 #'          simplify = TRUE)
+#'
+#' ## waypoints expressed as an encoded polyline
+#' polyWaypoints <- encode_pl(tram_stops[1:2, c("stop_lat")], tram_stops[1:2, c("stop_lon")])
+#' polyWaypoints <- list(via = paste0("enc:", polyWaypoints, ":"))
+#'
+#' google_directions(origin = "Melbourne Zoo, Melbourne",
+#'          destination = "Studley Park, Melbourne",
+#'          waypoints = polyWaypoints)
+#'
 #'
 #' ## using bus and less walking
 #' google_directions(origin = "Melbourne Airport, Australia",
@@ -84,7 +102,6 @@
 #'          mode = "transit",
 #'          transit_mode = "bus",
 #'          transit_routing_preference = "less_walking",
-#'          key = "<your valid api key>",
 #'          simplify = FALSE)
 #'
 #' ## using arrival time
@@ -94,7 +111,6 @@
 #'          mode = "transit",
 #'          transit_mode = "bus",
 #'          transit_routing_preference = "less_walking",
-#'          key = "<your valid api key>",
 #'          simplify = FALSE)
 #'
 #' ## return results in French
@@ -105,7 +121,6 @@
 #'          transit_mode = "bus",
 #'          transit_routing_preference = "less_walking",
 #'          language = "fr",
-#'          key = key,
 #'          simplify = FALSE)
 #'
 #' }
@@ -125,9 +140,12 @@ google_directions <- function(origin,
                               transit_routing_preference = NULL,
                               language = NULL,
                               region = NULL,
-                              key,
+                              key = get_api_key("directions"),
                               simplify = TRUE,
                               curl_proxy = NULL){
+
+  origin <- validateLocation(origin)
+  destination <- validateLocation(destination)
 
   directions_data(base_url = "https://maps.googleapis.com/maps/api/directions/json?",
                 information_type = "directions",
@@ -153,8 +171,53 @@ google_directions <- function(origin,
 }
 
 
+validateLocation <- function(location) UseMethod("validateLocation")
+
+#' @export
+validateLocation.list <- function(location){
+  if(length(location) > 1)
+    stop(locationStopMessage())
+
+  location[[1]]
+}
 
 
+#' @export
+validateLocation.character <- function(location) {
+  if(length(location) > 1)
+    stop(locationStopMessage())
+  location
+}
+
+#' @export
+validateLocation.numeric <- function(location) {
+  ## a vector has to be put into a list
+  if(length(location) > 2) stop(locationStopMessage())
+  location
+}
+
+#' @export
+validateLocation.data.frame <- function(location){
+
+  ## A dataframe can be used, and can be one column or two
+  ##
+  if(ncol(location) > 2) stop("A data.frame can have a maximum of two columns")
+  if(nrow(location) > 1) stop(locationStopMessage())
+
+  ## two-columns indicate lat/lons
+  if(ncol(location) == 2){
+    # location <- lapply(1:nrow(location), function(x) as.numeric(location[x, ]))
+    return(as.numeric(location))
+  }else{
+#    location <- lapply(1:nrow(location), function(x) as.character(location[x,]))
+    return(as.character(location))
+  }
+}
+
+#' @export
+validateLocation.default <- function(location) location
+
+locationStopMessage <- function() "Only a single location is allowed inside google_directions for origin or destination"
 
 
 

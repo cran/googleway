@@ -19,7 +19,7 @@
 #' @export
 decode_pl <- function(encoded){
 
-  if(class(encoded) != "character" | length(encoded) != 1)
+  if(!inherits(encoded, "character") | length(encoded) != 1)
     stop("encoded must be a string of length 1")
 
   tryCatch({
@@ -61,7 +61,7 @@ encode_pl <- function(lat, lon){
     stop("lat and lon must be the same length")
 
   tryCatch({
-    rcpp_encode_pl(lat, lon, length(lat))
+    googlePolylines::encodeCoordinates(lon, lat)
   },
   error = function(cond){
     message("The coordinates could not be encoded")

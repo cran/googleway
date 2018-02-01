@@ -6,7 +6,8 @@
 \usage{
 google_place_autocomplete(place_input, location = NULL, radius = NULL,
   language = NULL, place_type = NULL, components = NULL,
-  simplify = TRUE, key)
+  simplify = TRUE, curl_proxy = NULL,
+  key = get_api_key("place_autocomplete"))
 }
 \arguments{
 \item{place_input}{\code{string} The text string on which to search.
@@ -37,7 +38,10 @@ components to filter by country only. The country must be passed as a two
 character, ISO 3166-1 Alpha-2 compatible country code.
 For example: components=country:fr would restrict your results to places within France.}
 
-\item{simplify}{\code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string}
+\item{simplify}{\code{logical} - TRUE indicates the returned JSON will be
+coerced into a list. FALSE indicates the returend JSON will be returned as a string}
+
+\item{curl_proxy}{a curl proxy object}
 
 \item{key}{\code{string} A valid Google Developers Places API key}
 }
@@ -59,4 +63,3 @@ google_place_autocomplete("maha Restaurant", component = "au", key = key)
 
 }
 }
-

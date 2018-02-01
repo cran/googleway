@@ -15,9 +15,9 @@ Adds public transport information to a googleway map object
 \examples{
 \dontrun{
 
-google_map(key = "your_api_key") \%>\%
+map_key <- 'your_api_key'
+google_map(key = map_key) \%>\%
   add_transit()
 
 }
 }
-

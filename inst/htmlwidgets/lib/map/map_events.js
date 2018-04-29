@@ -125,7 +125,8 @@ function shape_click(map_id, shapeObject, shape_id, shapeInfo) {
     }
     google.maps.event.addListener(shapeObject, 'click', function (event) {
 
-        var eventInfo = $.extend(
+        var event_return_type,
+            eventInfo = $.extend(
             {
                 id: shape_id,
                 lat: event.latLng.lat(),
@@ -134,7 +135,7 @@ function shape_click(map_id, shapeObject, shape_id, shapeInfo) {
             },
             shapeInfo
         ),
-            event_return_type = window.params[1].event_return_type;
+        event_return_type = window.params[1].event_return_type;
         eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
         Shiny.onInputChange(map_id + "_shape_click", eventInfo);
     });
@@ -542,12 +543,21 @@ function add_mouseOver(map_id, mapObject, infoWindow, objectAttribute, attribute
 
           // if the mouse_over is specified without the group, we need an info window
             if (mapObject.get("mouseOver") !== undefined) {
+                
                 mapObject.setOptions({"_mouse_over": mapObject.get(objectAttribute)});
-
                 infoWindow.setContent(mapObject.get(objectAttribute).toString());
-
-                infoWindow.setPosition(event.latLng);
-                infoWindow.open(window[map_id + 'map']);
+                
+                
+                if (layerType === 'googleMarkers') {
+                    // markers need the info window to display at the top of the marker
+                    // not where the event took place
+                    this.infowindow = infoWindow;
+                    this.infowindow.open(window[map_id + 'map'], this);
+                } else {
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(window[map_id + 'map']);
+                }
+                
             }
         }
         
@@ -607,21 +617,35 @@ function add_mouseOver(map_id, mapObject, infoWindow, objectAttribute, attribute
  *          the value of the attribute
  */
 function add_infoWindow(map_id, mapObject, infoWindow, objectAttribute, attributeValue) {
-    
+        
     //'use strict';
 
     mapObject.set(objectAttribute, attributeValue);
+    
+    if (mapObject.chart_type === undefined) {
 
-    google.maps.event.addListener(mapObject, 'click', function(event){
+      google.maps.event.addListener(mapObject, 'click', function(event){
 
-        // the listener is being bound to the mapObject. So, when the infowindow
-        // contents are updated, the 'click' listener will need to see the new information
-        // ref: http://stackoverflow.com/a/13504662/5977215
-        mapObject.setOptions({"_information": mapObject.get(objectAttribute)});
+          // the listener is being bound to the mapObject. So, when the infowindow
+          // contents are updated, the 'click' listener will need to see the new   information
+          // ref: http://stackoverflow.com/a/13504662/5977215
+          mapObject.setOptions({"info_window": mapObject.get(objectAttribute)});
 
-        infoWindow.setContent(mapObject.get(objectAttribute));
+          infoWindow.setContent(mapObject.get(objectAttribute));
+          infoWindow.setPosition(event.latLng);
+          infoWindow.open(window[map_id + 'map']);
+        });
+        
+    } else { 
+        
+        mapObject.setOptions({"info_window": attributeValue});
+        
+        google.maps.event.addListener(mapObject, 'click', function(event) {
 
-        infoWindow.setPosition(event.latLng);
-        infoWindow.open(window[map_id + 'map']);
-      });
+          var c = chartObject(this);
+          infoWindow.setContent(c);
+          infoWindow.setPosition(event.latLng);
+          infoWindow.open(window[map_id + 'map']);
+        });
+    }
 }

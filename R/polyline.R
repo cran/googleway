@@ -9,7 +9,6 @@
 #'
 #' @param encoded String. An encoded polyline
 #' @return data.frame of lat/lon coordinates
-#' @importFrom Rcpp evalCpp
 #' @examples
 #' ## polyline joining the capital cities of Australian states
 #' pl <- "nnseFmpzsZgalNytrXetrG}krKsaif@kivIccvzAvvqfClp~uBlymzA~ocQ}_}iCthxo@srst@"
@@ -23,7 +22,7 @@ decode_pl <- function(encoded){
     stop("encoded must be a string of length 1")
 
   tryCatch({
-    rcpp_decode_pl(encoded)
+    googlePolylines::decode(encoded)[[1]]
   },
   error = function(cond){
     message("The encoded string could not be decoded. \nYou can manually check the encoded line at https://developers.google.com/maps/documentation/utilities/polylineutility \nIf the line can successfully be manually decoded, please file an issue: https://github.com/SymbolixAU/googleway/issues ")

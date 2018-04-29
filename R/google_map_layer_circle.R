@@ -1,10 +1,21 @@
+googleCircleDependency <- function() {
+  list(
+    htmltools::htmlDependency(
+      "circles",
+      "1.0.0",
+      system.file("htmlwidgets/lib/circles", package = "googleway"),
+      script = c("circles.js")
+    )
+  )
+}
+
+
 #' Add circle
 #'
 #' Add circles to a google map
 #'
 #' @param map a googleway map object created from \code{google_map()}
-#' @param data data frame containing at least two columns, one specifying the
-#' latitude coordinates, and the other specifying the longitude. If Null, the
+#' @param data data frame containing the data to use in the layer. If Null, the
 #' data passed into \code{google_map()} will be used.
 #' @param id string specifying the column containing an identifier for a shape
 #' @param lat string specifying the column of \code{data} containing the 'latitude'
@@ -45,7 +56,7 @@
 #' distinguish between shape layers for when using any \code{update_} function, and
 #' for separating legends.
 #' @param update_map_view logical specifying if the map should re-centre according to
-#' the circles
+#' the shapes
 #' @param z_index single value specifying where the circles appear in the layering
 #' of the map objects. Layers with a higher \code{z_index} appear on top of those with
 #' a lower \code{z_index}. See details.
@@ -57,6 +68,7 @@
 #' a named list indicating which colour attributes should be included in the legend.
 #' @param legend_options A list of options for controlling the legend.
 #' @param load_interval time in miliseconds to wait between plotting each shape
+#' @param focus_layer logical indicating if the map should re-centre according to this layer
 #'
 #' @section palette:
 #'
@@ -159,7 +171,8 @@ add_circles <- function(map,
                         palette = NULL,
                         legend = F,
                         legend_options = NULL,
-                        load_interval = 0
+                        load_interval = 0,
+                        focus_layer = FALSE
                         ){
 
   objArgs <- match.call(expand.dots = F)
@@ -181,7 +194,14 @@ add_circles <- function(map,
     objArgs <- latLonCheck(objArgs, lat, lon, names(data), "add_circles")
   }
 
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   logicalCheck(update_map_view)
+  logicalCheck(focus_layer)
   numericCheck(digits)
   numericCheck(z_index)
   loadIntervalCheck(load_interval)
@@ -214,9 +234,12 @@ add_circles <- function(map,
     shape <- createPolylineListColumn(shape)
   }
 
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, digits = digits)
 
-  invoke_method(map, 'add_circles', shape, update_map_view, layer_id, usePolyline, legend, load_interval)
+  map <- addDependency(map, googleCircleDependency())
+
+  invoke_method(map, 'add_circles', shape, update_map_view, layer_id, usePolyline, legend, load_interval, focus_layer)
 }
 
 #' @rdname clear
@@ -272,6 +295,12 @@ update_circles <- function(map, data, id,
   numericCheck(digits)
   palette <- paletteCheck(palette)
 
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   allCols <- circleColumns()
   requiredCols <- requiredCircleColumns()
   colourColumns <- shapeAttributes(fill_colour, stroke_colour)
@@ -293,6 +322,7 @@ update_circles <- function(map, data, id,
     shape <- addDefaults(shape, requiredDefaults, "circle")
   }
 
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, digits = digits)
 
   invoke_method(map, 'update_circles', shape, layer_id, legend)

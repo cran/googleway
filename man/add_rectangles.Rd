@@ -10,7 +10,7 @@ add_rectangles(map, data = get_map_data(map), north, east, south, west,
   fill_opacity = NULL, mouse_over = NULL, mouse_over_group = NULL,
   info_window = NULL, layer_id = NULL, update_map_view = TRUE,
   z_index = NULL, digits = 4, palette = NULL, legend = F,
-  legend_options = NULL, load_interval = 0)
+  legend_options = NULL, load_interval = 0, focus_layer = FALSE)
 }
 \arguments{
 \item{map}{a googleway map object created from \code{google_map()}}
@@ -71,7 +71,7 @@ distinguish between shape layers for when using any \code{update_} function, and
 for separating legends.}
 
 \item{update_map_view}{logical specifying if the map should re-centre according to
-the circles}
+the shapes}
 
 \item{z_index}{single value specifying where the circles appear in the layering
 of the map objects. Layers with a higher \code{z_index} appear on top of those with
@@ -89,6 +89,8 @@ a named list indicating which colour attributes should be included in the legend
 \item{legend_options}{A list of options for controlling the legend.}
 
 \item{load_interval}{time in miliseconds to wait between plotting each shape}
+
+\item{focus_layer}{logical indicating if the map should re-centre according to this layer}
 }
 \description{
 Adds a rectangle to a google map

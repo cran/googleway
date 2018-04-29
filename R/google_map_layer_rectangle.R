@@ -1,3 +1,14 @@
+googleRectangleDependency <- function() {
+  list(
+    htmltools::htmlDependency(
+      "rectangles",
+      "1.0.0",
+      system.file("htmlwidgets/lib/rectangles", package = "googleway"),
+      script = c("rectangles.js")
+    )
+  )
+}
+
 #' Add Rectangles
 #'
 #' Adds a rectangle to a google map
@@ -77,7 +88,8 @@ add_rectangles <- function(map,
                            palette = NULL,
                            legend = F,
                            legend_options = NULL,
-                           load_interval = 0
+                           load_interval = 0,
+                           focus_layer = FALSE
                            ){
 
   objArgs <- match.call(expand.dots = F)
@@ -87,10 +99,18 @@ add_rectangles <- function(map,
   layer_id <- layerId(layer_id)
 
   logicalCheck(update_map_view)
+  logicalCheck(focus_layer)
   numericCheck(digits)
   numericCheck(z_index)
   loadIntervalCheck(load_interval)
   palette <- paletteCheck(palette)
+
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   ## END PARAMETER CHECKS
 
   allCols <- rectangleColumns()
@@ -114,9 +134,12 @@ add_rectangles <- function(map,
     shape <- addDefaults(shape, requiredDefaults, "rectangle")
   }
 
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, digits = digits)
 
-  invoke_method(map, 'add_rectangles', shape, update_map_view, layer_id, legend, load_interval)
+  map <- addDependency(map, googleRectangleDependency())
+
+  invoke_method(map, 'add_rectangles', shape, update_map_view, layer_id, legend, load_interval, focus_layer)
 }
 
 
@@ -162,6 +185,12 @@ update_rectangles <- function(map, data, id,
   numericCheck(digits)
   palette <- paletteCheck(palette)
 
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   allCols <- rectangleColumns()
   requiredCols <- requiredShapeColumns()
   colourColumns <- shapeAttributes(fill_colour, stroke_colour)
@@ -182,6 +211,7 @@ update_rectangles <- function(map, data, id,
     shape <- addDefaults(shape, requiredDefaults, "rectangle")
   }
 
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, digits = digits)
 
   invoke_method(map, 'update_rectangles', shape, layer_id, legend)

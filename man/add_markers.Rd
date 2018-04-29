@@ -9,13 +9,12 @@ add_markers(map, data = get_map_data(map), id = NULL, colour = NULL,
   draggable = NULL, opacity = NULL, label = NULL, info_window = NULL,
   mouse_over = NULL, mouse_over_group = NULL, marker_icon = NULL,
   layer_id = NULL, cluster = FALSE, update_map_view = TRUE, digits = 4,
-  load_interval = 0)
+  load_interval = 0, focus_layer = FALSE)
 }
 \arguments{
 \item{map}{a googleway map object created from \code{google_map()}}
 
-\item{data}{data frame containing at least two columns, one specifying the
-latitude coordinates, and the other specifying the longitude. If Null, the
+\item{data}{data frame containing the data to use in the layer. If Null, the
 data passed into \code{google_map()} will be used.}
 
 \item{id}{string specifying the column containing an identifier for a shape}
@@ -66,12 +65,14 @@ for separating legends.}
 when the map zoomed out}
 
 \item{update_map_view}{logical specifying if the map should re-centre according to
-the circles}
+the shapes}
 
 \item{digits}{integer. Use this parameter to specify how many digits (decimal places)
 should be used for the latitude / longitude coordinates.}
 
 \item{load_interval}{time in miliseconds to wait between plotting each shape}
+
+\item{focus_layer}{logical indicating if the map should re-centre according to this layer}
 }
 \description{
 Add markers to a google map

@@ -11,8 +11,12 @@
  * @param layer_id
  */
 
-function add_circles(map_id, data_circles, update_map_view, layer_id, use_polyline, legendValues, interval) {
+function add_circles(map_id, data_circles, update_map_view, layer_id, use_polyline, legendValues, interval, focus) {
 
+    if (focus === true) {
+        clear_bounds(map_id);
+    }
+    
     var i,
         infoWindow = new google.maps.InfoWindow();
 
@@ -30,14 +34,14 @@ function add_circles(map_id, data_circles, update_map_view, layer_id, use_polyli
 function set_circle(map_id, circle, infoWindow, update_map_view, layer_id, use_polyline, timeout) {
 
     window.setTimeout(function () {
-        
+
         var j, lon, lat, path, latlon, Circle;
-        
+
         if (use_polyline) {
 
             for (j = 0; j < circle.polyline.length; j++) {
                 path = google.maps.geometry.encoding.decodePath(circle.polyline[j]);
-                
+
                 latlon = new google.maps.LatLng(path[0].lat(), path[0].lng());
 
                 Circle = new google.maps.Circle({
@@ -56,16 +60,16 @@ function set_circle(map_id, circle, infoWindow, update_map_view, layer_id, use_p
                     mouseOverGroup: circle.mouse_over_group,
                     zIndex: circle.z_index
                 });
-                
+
                 set_each_circle(Circle, circle, infoWindow, update_map_view, map_id, layer_id);
-                
+
                 if (update_map_view === true) {
                     window[map_id + 'mapBounds'].extend(latlon);
                     window[map_id + 'map'].fitBounds(window[map_id + 'mapBounds']);
                 }
             }
         } else {
-        
+
             latlon = new google.maps.LatLng(circle.lat, circle.lng);
             Circle = new google.maps.Circle({
                 id: circle.id,
@@ -81,11 +85,14 @@ function set_circle(map_id, circle, infoWindow, update_map_view, layer_id, use_p
                 radius: circle.radius,
                 mouseOver: circle.mouse_over,
                 mouseOverGroup: circle.mouse_over_group,
-                zIndex: circle.z_index
+                zIndex: circle.z_index,
+                chart_type: circle.chart_type,
+                chart_data: circle.chart_data,
+                chart_options: circle.chart_options
             });
-            
+
             set_each_circle(Circle, circle, infoWindow, update_map_view, map_id, layer_id);
-            
+
             if (update_map_view === true) {
                 window[map_id + 'mapBounds'].extend(latlon);
                 window[map_id + 'map'].fitBounds(window[map_id + 'mapBounds']);
@@ -95,12 +102,14 @@ function set_circle(map_id, circle, infoWindow, update_map_view, layer_id, use_p
 }
 
 function set_each_circle(Circle, circle, infoWindow, update_map_view, map_id, layer_id) {
-    
+
+    var shapeInfo;
+
     window[map_id + 'googleCircles' + layer_id].push(Circle);
     Circle.setMap(window[map_id + 'map']);
 
     if (circle.info_window) {
-        add_infoWindow(map_id, Circle, infoWindow, '_information', circle.info_window);
+        add_infoWindow(map_id, Circle, infoWindow, 'info_window', circle.info_window);
     }
 
     if (circle.mouse_over || circle.mouse_over_group) {
@@ -202,7 +211,7 @@ function update_circles(map_id, data_circle, layer_id, legendValues) {
                     window[map_id + 'googleCircles' + layer_id][i].setOptions({strokeOpacity: attributeValue});
                     break;
                 case "info_window":
-                    window[map_id + 'googleCircles' + layer_id][i].setOptions({_information: attributeValue});
+                    window[map_id + 'googleCircles' + layer_id][i].setOptions({info_window: attributeValue});
                     break;
                 }
             }

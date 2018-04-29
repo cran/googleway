@@ -1,3 +1,13 @@
+googlePolygonDependency <- function() {
+  list(
+    htmltools::htmlDependency(
+      "polygons",
+      "1.0.0",
+      system.file("htmlwidgets/lib/polygons", package = "googleway"),
+      script = c("polygons.js")
+    )
+  )
+}
 
 #' Add polygon
 #'
@@ -135,7 +145,9 @@ add_polygons <- function(map,
                          palette = NULL,
                          legend = F,
                          legend_options = NULL,
-                         load_interval = 0){
+                         load_interval = 0,
+                         focus_layer = FALSE
+                         ){
 
   objArgs <- match.call(expand.dots = F)
 
@@ -148,6 +160,7 @@ add_polygons <- function(map,
     objArgs[['polyline']] <- polyline
   }
 
+
   ## PARAMETER CHECKS
   if(!dataCheck(data, "add_polygon")) data <- polygonDefaults(1)
   layer_id <- layerId(layer_id)
@@ -159,7 +172,14 @@ add_polygons <- function(map,
     objArgs <- latLonCheck(objArgs, lat, lon, names(data), "add_polyline")
   }
 
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   logicalCheck(update_map_view)
+  logicalCheck(focus_layer)
   numericCheck(digits)
   numericCheck(z_index)
   loadIntervalCheck(load_interval)
@@ -176,13 +196,12 @@ add_polygons <- function(map,
   pathId <- lst$pathId
 
   ## END PARAMETER CHECKS
-
-
   allCols <- polygonColumns()
   requiredCols <- requiredShapeColumns()
   colourColumns <- shapeAttributes(fill_colour = fill_colour, stroke_colour = stroke_colour)
 
   shape <- createMapObject(data, allCols, objArgs)
+
   pal <- createPalettes(shape, colourColumns)
   colour_palettes <- createColourPalettes(data, pal, colourColumns, palette)
   colours <- createColours(shape, colour_palettes)
@@ -201,8 +220,8 @@ add_polygons <- function(map,
 
   if(usePolyline){
     shape <- createPolylineListColumn(shape)
+    shape <- createInfoWindowChart(shape, infoWindowChart, id)
     shape <- jsonlite::toJSON(shape, digits = digits)
-
   }else{
 
     ids <- unique(shape[, 'id'])
@@ -210,11 +229,14 @@ add_polygons <- function(map,
     keep <- setdiff(n, c("id", "pathId", "lat", "lng"))
 
     lst_polygon <- objPolygonCoords(shape, ids, keep)
+    lst_polygon <- createInfoWindowChart(lst_polygon, infoWindowChart, id)
 
     shape <- jsonlite::toJSON(lst_polygon, digits = digits, auto_unbox = T)
   }
 
-  invoke_method(map, 'add_polygons', shape, update_map_view, layer_id, usePolyline, legend, load_interval)
+  map <- addDependency(map, googlePolygonDependency())
+
+  invoke_method(map, 'add_polygons', shape, update_map_view, layer_id, usePolyline, legend, load_interval, focus_layer)
 }
 
 
@@ -320,6 +342,12 @@ update_polygons <- function(map, data, id,
   objArgs <- lst$objArgs
   id <- lst$id
 
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
+  }
+
   allCols <- polygonUpdateColumns()
   requiredCols <- requiredShapeUpdateColumns()
   colourColumns <- shapeAttributes(fill_colour, stroke_colour)
@@ -341,6 +369,7 @@ update_polygons <- function(map, data, id,
     shape <- addDefaults(shape, requiredDefaults, "polygonUpdate")
   }
 
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, auto_unbox = T)
 
   invoke_method(map, 'update_polygons', shape, layer_id, legend)

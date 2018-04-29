@@ -5,8 +5,7 @@ test_that("sf objects encoded", {
 
   testthat::skip_on_cran()
   testthat::skip_on_travis()
-
-  library(sf)
+  testthat::skip_if_not_installed(pkg = "sf")
 
   df <- data.frame(myId = c(1,1,1,1,1,1,1,1,2,2,2,2),
                    lineId = c(1,1,1,1,2,2,2,2,1,1,1,2),
@@ -33,24 +32,14 @@ test_that("sf objects encoded", {
     sf::st_sf(geometry = multipoint)
   )
 
-
-  expect_true(
-    inherits(googleway:::normalise_sf(sf), "sfencoded")
-  )
+  expect_true(inherits(googleway:::normalise_sf(sf), "sfencoded"))
 
   enc <- googlePolylines::encode(sf)
-  expect_true(
-    googleway:::findEncodedColumn(enc, NULL) == "geometry"
-  )
-
-  expect_true(
-    googleway:::findEncodedColumn(enc, "geometry") == "geometry"
-  )
+  expect_true(googleway:::findEncodedColumn(enc, NULL) == "geometry")
+  expect_true(googleway:::findEncodedColumn(enc, "geometry") == "geometry")
 
   df <- data.frame(polyline = "abc")
-  expect_true(
-    googleway:::findEncodedColumn(df, 'polyline') == "polyline"
-  )
+  expect_true(googleway:::findEncodedColumn(df, 'polyline') == "polyline")
 
 })
 
@@ -58,8 +47,8 @@ test_that("correct sf rows are returned", {
 
   testthat::skip_on_cran()
   testthat::skip_on_travis()
+  testthat::skip_if_not_installed(pkg = "sf")
 
-  library(sf)
   df <- data.frame(myId = c(1,1,1,1,1,1,1,1,2,2,2,2),
   								 lineId = c(1,1,1,1,2,2,2,2,1,1,1,2),
   								 lon = c(-80.190, -66.118, -64.757, -80.190,  -70.579, -67.514, -66.668, -70.579, -70, -49, -51, -70),
@@ -75,7 +64,7 @@ test_that("correct sf rows are returned", {
   linestring <- sf::st_sfc(sf::st_linestring(p3))
   multilinestring <- sf::st_sfc(sf::st_multilinestring(list(p1, p2)))
   multipolygon <- sf::st_sfc(sf::st_multipolygon(x = list(list(p1, p2), list(p3))))
-  #
+
   sf <- rbind(
   	sf::st_sf(geometry = polygon),
   	sf::st_sf(geometry = multipolygon),
@@ -85,35 +74,19 @@ test_that("correct sf rows are returned", {
     sf::st_sf(geometry = multipoint)
   	)
 
-  # m <- google_map(key = 'abc')
-  # p <- googleway::add_polygons(m, data = sf)
-  # p$x$calls[[1]]
-
-  expect_true(
-    nrow(googleway:::normaliseSfData(sf, "POLYGON")) == 2
-  )
-
-  expect_true(
-    nrow(googleway:::normaliseSfData(sf, "LINE")) == 2
-  )
-
-  expect_true(
-    nrow(googleway:::normaliseSfData(sf, "POINT")) == 2
-  )
+  expect_true(nrow(googleway:::normaliseSfData(sf, "POLYGON")) == 2)
+  expect_true(nrow(googleway:::normaliseSfData(sf, "LINE")) == 2)
+  expect_true(nrow(googleway:::normaliseSfData(sf, "POINT")) == 2)
 
   enc <- googlePolylines::encode(sf)
 
-  expect_true(
-    nrow(googleway:::normaliseSfData(enc, "POLYGON")) == 2
-  )
+  expect_identical(enc, googleway:::normalise_sf(sf))
+  expect_identical(enc, googleway:::normalise_sf(enc))
+  expect_error(googleway:::normalise_sf(""), "Expecting an sf or sfencoded object to add_sf")
 
-  expect_true(
-    nrow(googleway:::normaliseSfData(enc, "LINE")) == 2
-  )
-
-  expect_true(
-    nrow(googleway:::normaliseSfData(enc, "POINT")) == 2
-  )
+  expect_true(nrow(googleway:::normaliseSfData(enc, "POLYGON")) == 2)
+  expect_true(nrow(googleway:::normaliseSfData(enc, "LINE")) == 2)
+  expect_true(nrow(googleway:::normaliseSfData(enc, "POINT")) == 2)
 
 })
 

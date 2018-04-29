@@ -1,3 +1,27 @@
+
+googleMarkerDependency <- function() {
+  list(
+    htmltools::htmlDependency(
+      "markers",
+      "1.0.0",
+      system.file("htmlwidgets/lib/markers", package = "googleway"),
+      script = c("markers.js", "markerclusterer.js")
+    )
+  )
+}
+
+# googleMarkerClustererDependency <- function() {
+#   list(
+#     htmltools::htmlDependency(
+#       "MarkerClusterer",
+#       "1.0.0",
+#       system.file("htmlwidgets/lib/map", package = "googleway"),
+#       script = "markerclusterer.js"
+#     )
+#   )
+# }
+
+
 #' Add markers
 #'
 #' Add markers to a google map
@@ -59,7 +83,9 @@ add_markers <- function(map,
                         cluster = FALSE,
                         update_map_view = TRUE,
                         digits = 4,
-                        load_interval = 0){
+                        load_interval = 0,
+                        focus_layer = FALSE
+                        ){
 
   objArgs <- match.call(expand.dots = F)
 
@@ -75,13 +101,38 @@ add_markers <- function(map,
   layer_id <- layerId(layer_id)
 
   usePolyline <- isUsingPolyline(polyline)
-  if( !usePolyline ) {
+  if ( !usePolyline ) {
     objArgs <- latLonCheck(objArgs, lat, lon, names(data), "add_markers")
+  }
+
+  infoWindowChart <- NULL
+  if (!is.null(info_window) && isInfoWindowChart(info_window)) {
+    infoWindowChart <- info_window
+    objArgs[['info_window']] <- NULL
   }
 
   objArgs <- markerColourIconCheck(data, objArgs, colour, marker_icon)
 
+  ## need to do an 'infoWindowCheck'
+  ## to see if the user passed in a list, taht will be used as a chart...
+
+  ## IDEAS:
+  ## - pass the data separately to JS, and let the browser find
+  ## the correct data to use in the info_window from the JSON, when the marker is clicked
+  ##
+  ## - within the JS code, inside the `google.maps.event.addListener()` for info windows
+  ## write code taht extracts the correct info window content from an InfoWindowContent JSON object
+  ## Which will mean passing this object in throgh R.
+  ## I can test this directly by adding in some JSON to use as the pie chart
+  ## and see if plotting it works.
+  ##
+  ## - before 'shape contstruction', check type of info_window content. If a list,
+  ## - remove it from the objArgs, and only join it on just before invoking the
+  ## - js method
+
+
   loadIntervalCheck(load_interval)
+  logicalCheck(focus_layer)
   logicalCheck(cluster)
   logicalCheck(update_map_view)
   numericCheck(digits)
@@ -105,9 +156,14 @@ add_markers <- function(map,
   if( usePolyline ) {
     shape <- createPolylineListColumn(shape)
   }
+
+  shape <- createInfoWindowChart(shape, infoWindowChart, id)
   shape <- jsonlite::toJSON(shape, digits = digits)
 
-  invoke_method(map, 'add_markers', shape, cluster, update_map_view, layer_id, usePolyline, load_interval)
+  # print(shape)
+  map <- addDependency(map, googleMarkerDependency())
+
+  invoke_method(map, 'add_markers', shape, cluster, update_map_view, layer_id, usePolyline, load_interval, focus_layer)
 }
 
 

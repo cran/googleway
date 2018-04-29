@@ -2,8 +2,6 @@
 ## TODO:
 ## - plot bbox as rectangle (if requested?)
 
-#' @useDynLib googleway
-#' @importFrom Rcpp sourceCpp
 #' @importFrom jsonlite fromJSON
 #' @importFrom curl curl
 #' @importFrom grDevices col2rgb
@@ -115,7 +113,6 @@ directions_data <- function(base_url,
             "key" = key)
 
   map_url <- constructURL(base_url, args)
-
   if(length(map_url) > 1)
     stop("invalid map_url")
 

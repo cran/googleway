@@ -90,19 +90,32 @@ The Google Maps Directions API is a service that calculates directions between
 locations. You can search for directions for several modes of transportation,
 including transit, driving, walking, or cycling.
 }
+\section{API use and limits}{
+
+
+The amount of queries you can make to Google's APIs is dependent on both the service
+and the API you are using.
+
+Each API has specific quotas and limits. Check Google's API documentation for details.
+
+View your usage at the Google Cloud Console \url{https://console.cloud.google.com/}
+
+Each API can only accept and return one request at a time. If you write a loop
+to make multiple API calls you should ensure you don't go over your quota / limits
+during the loop.
+}
+
 \examples{
 \dontrun{
 
-api_key <- "your_api_key"
+set_key("YOUR_GOOGLE_API_KEY")
+
 ## using lat/long coordinates
 google_directions(origin = c(-37.8179746, 144.9668636),
           destination = c(-37.81659, 144.9841),
-          mode = "walking",
-          key = api_key)
+          mode = "walking")
 
 
-## set the key so it's available to all function calls
-set_key(key = api_key)
 ## using address string
 google_directions(origin = "Flinders Street Station, Melbourne",
          destination = "MCG, Melbourne",

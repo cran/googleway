@@ -43,15 +43,30 @@ Locations can be specified as either a data.frame containing both a lat/latitude
 and lon/longitude column, or
 a single encoded polyline
 }
+\section{API use and limits}{
+
+
+The amount of queries you can make to Google's APIs is dependent on both the service
+and the API you are using.
+
+Each API has specific quotas and limits. Check Google's API documentation for details.
+
+View your usage at the Google Cloud Console \url{https://console.cloud.google.com/}
+
+Each API can only accept and return one request at a time. If you write a loop
+to make multiple API calls you should ensure you don't go over your quota / limits
+during the loop.
+}
+
 \examples{
 \dontrun{
 
+set_key("YOUR_GOOGLE_API_KEY")
 ## elevation data for the MCG in Melbourne
 df <- data.frame(lat = -37.81659,
                  lon = 144.9841)
 
 google_elevation(df_locations = df,
-                 key = "<your valid api key>",
                  simplify = TRUE)
 
 
@@ -63,7 +78,6 @@ df <- data.frame(lat = c(-37.81659, -37.88950),
 df <- google_elevation(df_locations = df,
                        location_type = "path",
                        samples = 20,
-                       key = "<your valid api key>",
                        simplify = TRUE)
 
 ## plot results

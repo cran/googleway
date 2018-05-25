@@ -56,19 +56,20 @@
 #' FALSE indicates the returend JSON will be returned as a string
 #' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the route between origin and destination
+#'
+#' @inheritSection google_geocode API use and limits
+#'
 #' @examples
 #' \dontrun{
 #'
-#' api_key <- "your_api_key"
+#' set_key("YOUR_GOOGLE_API_KEY")
+#'
 #' ## using lat/long coordinates
 #' google_directions(origin = c(-37.8179746, 144.9668636),
 #'           destination = c(-37.81659, 144.9841),
-#'           mode = "walking",
-#'           key = api_key)
+#'           mode = "walking")
 #'
 #'
-#' ## set the key so it's available to all function calls
-#' set_key(key = api_key)
 #' ## using address string
 #' google_directions(origin = "Flinders Street Station, Melbourne",
 #'          destination = "MCG, Melbourne",

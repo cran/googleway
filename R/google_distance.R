@@ -37,24 +37,24 @@
 #' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
 #' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the distance between origins and destinations
+#'
+#' @inheritSection google_geocode API use and limits
+#'
 #' @examples
 #' \dontrun{
 #'
-#' api_key <- 'your_api_key'
+#' set_key("YOUR_GOOGLE_API_KEY")
 #' google_distance(origins = list(c("Melbourne Airport, Australia"),
 #'                              c("MCG, Melbourne, Australia"),
 #'                              c(-37.81659, 144.9841)),
 #'                              destinations = c("Portsea, Melbourne, Australia"),
-#'                              key = api_key,
 #'                              simplify = FALSE)
 #'
 #' google_distance(origins = c(-37.816, 144.9841),
-#'     destinations = c("Melbourne Airport, Australia", "Flinders Street Station, Melbourne"),
-#'     key = api_key)
+#'     destinations = c("Melbourne Airport, Australia", "Flinders Street Station, Melbourne"))
 #'
 #' google_distance(origins = tram_stops[1:5, c("stop_lat", "stop_lon")],
-#'      destinations = tram_stops[10:12, c("stop_lat", "stop_lon")],
-#'      key = api_key)
+#'      destinations = tram_stops[10:12, c("stop_lat", "stop_lon")],)
 #'
 #' }
 #' @export

@@ -43,10 +43,26 @@ Geocoding is the process of converting addresses (like "1600 Amphitheatre
 Parkway, Mountain View, CA") into geographic coordinates (like latitude 37.423021
 and longitude -122.083739), which you can use to place markers on a map, or position the map.
 }
+\section{API use and limits}{
+
+
+The amount of queries you can make to Google's APIs is dependent on both the service
+and the API you are using.
+
+Each API has specific quotas and limits. Check Google's API documentation for details.
+
+View your usage at the Google Cloud Console \url{https://console.cloud.google.com/}
+
+Each API can only accept and return one request at a time. If you write a loop
+to make multiple API calls you should ensure you don't go over your quota / limits
+during the loop.
+}
+
 \examples{
 \dontrun{
+
+set_key("YOUR_GOOGLE_API_KEY")
 df <- google_geocode(address = "MCG, Melbourne, Australia",
-                     key = "<your valid api key>",
                      simplify = TRUE)
 
 df$results$geometry$location
@@ -59,7 +75,6 @@ bounds <- list(c(34.172684,-118.604794),
 
 js <- google_geocode(address = "Winnetka",
                      bounds = bounds,
-                     key = "<your valid api key>",
                      simplify = FALSE)
 
 ## using components
@@ -67,7 +82,6 @@ components <- data.frame(component = c("postal_code", "country"),
                          value = c("3000", "AU"))
 
 df <- google_geocode(address = "Flinders Street Station",
-                   key = "<your valid api key>",
                    components = components,
                    simplify = FALSE)
 

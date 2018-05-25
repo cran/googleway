@@ -24,15 +24,18 @@
 #' @param simplify \code{logical} - TRUE indicates the returned JSON will be coerced into a list. FALSE indicates the returend JSON will be returned as a string
 #' @param curl_proxy a curl proxy object
 #' @return Either list or JSON string of the elevation data
+#'
+#' @inheritSection google_geocode API use and limits
+#'
 #' @examples
 #' \dontrun{
 #'
+#' set_key("YOUR_GOOGLE_API_KEY")
 #' ## elevation data for the MCG in Melbourne
 #' df <- data.frame(lat = -37.81659,
 #'                  lon = 144.9841)
 #'
 #' google_elevation(df_locations = df,
-#'                  key = "<your valid api key>",
 #'                  simplify = TRUE)
 #'
 #'
@@ -44,7 +47,6 @@
 #' df <- google_elevation(df_locations = df,
 #'                        location_type = "path",
 #'                        samples = 20,
-#'                        key = "<your valid api key>",
 #'                        simplify = TRUE)
 #'
 #' ## plot results

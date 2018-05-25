@@ -65,24 +65,36 @@ The Google Maps Distance Matrix API is a service that provides travel distance
 and time for a matrix of origins and destinations, based on the recommended
 route between start and end points.
 }
+\section{API use and limits}{
+
+
+The amount of queries you can make to Google's APIs is dependent on both the service
+and the API you are using.
+
+Each API has specific quotas and limits. Check Google's API documentation for details.
+
+View your usage at the Google Cloud Console \url{https://console.cloud.google.com/}
+
+Each API can only accept and return one request at a time. If you write a loop
+to make multiple API calls you should ensure you don't go over your quota / limits
+during the loop.
+}
+
 \examples{
 \dontrun{
 
-api_key <- 'your_api_key'
+set_key("YOUR_GOOGLE_API_KEY")
 google_distance(origins = list(c("Melbourne Airport, Australia"),
                              c("MCG, Melbourne, Australia"),
                              c(-37.81659, 144.9841)),
                              destinations = c("Portsea, Melbourne, Australia"),
-                             key = api_key,
                              simplify = FALSE)
 
 google_distance(origins = c(-37.816, 144.9841),
-    destinations = c("Melbourne Airport, Australia", "Flinders Street Station, Melbourne"),
-    key = api_key)
+    destinations = c("Melbourne Airport, Australia", "Flinders Street Station, Melbourne"))
 
 google_distance(origins = tram_stops[1:5, c("stop_lat", "stop_lon")],
-     destinations = tram_stops[10:12, c("stop_lat", "stop_lon")],
-     key = api_key)
+     destinations = tram_stops[10:12, c("stop_lat", "stop_lon")],)
 
 }
 }

@@ -77,7 +77,8 @@ test_that("Departure time is not in the past",{
                          destination = c(-37.81659, 144.9841),
                          departure_time = as.POSIXct("2015-01-01"),
                          key = "abc",
-                         simplify = TRUE)
+                         simplify = TRUE),
+    "departure_time for driving mode must not be in the past"
     )
 
 })

@@ -61,29 +61,29 @@ directions_data <- function(base_url,
   transit_mode <- validateTransitMode(transit_mode, mode)
   transit_routing_preference <- validateTransitRoutingPreference(transit_routing_preference, mode)
 
-  departure_time <- validateDepartureTime(departure_time)
+  departure_time <- validateDepartureTime(departure_time, mode)
 
   arrival_time <- validateArrivalTime(arrival_time)
   arrival_time <- validateArrivalDepartureTimes(arrival_time, departure_time)
 
   alternatives <- validateAlternatives(alternatives)
 
-  if(!is.null(traffic_model) & is.null(departure_time))
-    departure_time <- Sys.time()
+  # if(!is.null(traffic_model) & is.null(departure_time))
+  #   departure_time <- as.integer( Sys.time() )
 
   traffic_model <- validateTrafficModel(traffic_model)
 
   ## check origin/destinations are valid
-  if(information_type == "directions"){
+  if( information_type == "directions" ) {
     origin <- check_location(origin, "Origin")
     destination <- check_location(destination, "Destination")
-  }else if(information_type == "distance"){
+  }else if( information_type == "distance" ) {
     origin <- check_multiple_locations(origin, "Origins elements")
     destination <- check_multiple_locations(destination, "Destinations elements")
   }
 
   ## times as integers
-  departure_time <- ifelse(is.null(departure_time), as.integer(Sys.time()), as.integer(departure_time))
+  #departure_time <- ifelse(is.null(departure_time), as.integer(Sys.time()), as.integer(departure_time))
   arrival_time <- as.integer(arrival_time)
 
   waypoints <- validateWaypoints(waypoints, optimise_waypoints, mode)

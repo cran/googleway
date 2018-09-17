@@ -12,7 +12,7 @@
 
 <meta name="author" content="D Cooley" />
 
-<meta name="date" content="2018-05-25" />
+<meta name="date" content="2018-09-17" />
 
 <title>Googleway Vignette</title>
 
@@ -280,7 +280,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Googleway Vignette</h1>
 <h4 class="author"><em>D Cooley</em></h4>
-<h4 class="date"><em>2018-05-25</em></h4>
+<h4 class="date"><em>2018-09-17</em></h4>
 
 
 <div id="TOC">
@@ -400,6 +400,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ##  -  elevation :  
 ##  -  geocode :  
 ##  -  places :  
+##  -  find_place :  
 ##  -  place_autocomplete :  
 ##  -  place_details :  
 ##  -  reverse_geocode :  
@@ -419,6 +420,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ##  -  elevation :  
 ##  -  geocode :  
 ##  -  places :  
+##  -  find_place :  
 ##  -  place_autocomplete :  
 ##  -  place_details :  
 ##  -  reverse_geocode :  
@@ -729,16 +731,14 @@ df$results$geometry
 <div id="google-places-api" class="section level2">
 <h2>Google Places API</h2>
 <p>The <a href="https://developers.google.com/places/"><strong>Google Maps Places API</strong></a> gets data from the same database used by Google Maps and Google+ Local. Places features more than 100 million businesses and points of interest that are updated frequently through owner-verified listings and user-moderated contributions.</p>
-<p>There are four types of search you can perform</p>
+<p>There are three types of search you can perform</p>
 <ul>
 <li>Nearby</li>
 <li>Text</li>
-<li>Radar</li>
 <li>Place Details</li>
 </ul>
 <p>A <strong>Nearby</strong> Search lets you search for places within a specified area. You can refine your search request by supplying keywords or specifying the type of place you are searching for.</p>
 <p>A <strong>Text</strong> Search Service is a web service that returns information about a set of places based on a string — for example “pizza in New York” or “shoe stores near Ottawa” or “123 Main Street”. The service responds with a list of places matching the text string and any location bias that has been set.</p>
-<p>A <strong>Radar</strong> search lets you search for places within a specified search radius by keyword, type or name. The Radar search returns more results than a Nearby or Text search, but the results contain fewer fields.</p>
 <p>A <strong>Place Detail</strong> search (using <code>google_place_details()</code>) can be performed when you have a given <code>place_id</code> from one of the other three search methods.</p>
 <div id="text" class="section level3">
 <h3>Text</h3>

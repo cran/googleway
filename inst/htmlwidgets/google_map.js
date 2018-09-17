@@ -8,9 +8,12 @@ HTMLWidgets.widget({
         return {
             renderValue: function (x) {
 
-                window.params = [];
-                window.params.push({'map_id' : el.id });
-                window.params.push({'event_return_type' : x.event_return_type});
+                //console.log( x ) ;
+                window.googleway = [];
+                window.googleway.params = [];
+                window.googleway.params.push({'map_id' : el.id });
+                window.googleway.params.push({'event_return_type' : x.event_return_type});
+                //console.log( window.googleway.params );
 
                 // visualisation layers
                 window[el.id + 'googleTrafficLayer'] = [];
@@ -299,7 +302,7 @@ function initialise_map(el, x) {
 
                 if (HTMLWidgets.shinyMode) {
 
-                    event_return_type = window.params[1].event_return_type,
+                    event_return_type = window.googleway.params[1].event_return_type,
                         eventInfo = {
                             address_components: place.address_components,
                             lat: place.geometry.location.lat(),
@@ -340,6 +343,10 @@ function initialise_map(el, x) {
                 //console.log("Unknown function " + x.calls[layerCalls]);
             }
         }
+    }
+
+    if( x.geolocation === true) {
+        add_geolocation();
     }
 
     // listeners
@@ -455,15 +462,15 @@ function removeControl(map_id, legend_id, position) {
 
 function clearControl(control, legend_id) {
 
-    if (control != null) {
-        control.forEach(function (item, index) {
-            if (item != null) {
-                if (item.getAttribute('id') === legend_id) {
-                    control.removeAt(index);
-                }
-            }
-        });
-    }
+  if (control != null) {
+    control.forEach(function (item, index) {
+      if (item != null) {
+        if (item.getAttribute('id') === legend_id) {
+          control.removeAt(index);
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -472,22 +479,22 @@ function clearControl(control, legend_id) {
 */
 function clear_object(map_id, objType, layer_id) {
 
-    var i = 0;
-    if (window[map_id + objType + layer_id] && window[map_id + objType + layer_id].length) {
-        for (i = 0; i < window[map_id + objType + layer_id].length; i++) {
-            //https://developers.google.com/maps/documentation/javascript/reference/3/#event
-            google.maps.event.clearInstanceListeners(window[map_id + objType + layer_id][i]);
-            window[map_id + objType + layer_id][i].setMap(null);
-            window[map_id + objType + layer_id][i] = null;
-        }
-        window[map_id + objType + layer_id] = null;
+  var i = 0;
+  if (window[map_id + objType + layer_id] && window[map_id + objType + layer_id].length) {
+    for (i = 0; i < window[map_id + objType + layer_id].length; i++) {
+    //https://developers.google.com/maps/documentation/javascript/reference/3/#event
+    google.maps.event.clearInstanceListeners(window[map_id + objType + layer_id][i]);
+    window[map_id + objType + layer_id][i].setMap(null);
+    window[map_id + objType + layer_id][i] = null;
+  }
+  window[map_id + objType + layer_id] = null;
 
-        clear_legend(map_id, layer_id);
-    }
+  clear_legend(map_id, layer_id);
+  }
 }
 
 function delay(t, v) {
-    return new Promise(function(resolve) {
-        setTimeout(resolve.bind(null, v), t)
-    });
+  return new Promise(function(resolve) {
+    setTimeout(resolve.bind(null, v), t);
+  });
 }

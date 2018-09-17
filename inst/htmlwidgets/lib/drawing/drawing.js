@@ -7,10 +7,10 @@
 function add_drawing (map_id, drawing_modes, marker, circle, rectangle, polyline, polygon, delete_on_change) {
 
     window[map_id + 'googleDrawingOverlays'] = [];
-    
+
     //createWindowObject(map_id, 'googleDrawingOverlays', layer_id);
-    
-    var drawingInfo, 
+
+    var drawingInfo,
         drawingManager = new google.maps.drawing.DrawingManager({
 
             drawingMode: google.maps.drawing.OverlayType.MARKER,
@@ -60,7 +60,7 @@ function add_drawing (map_id, drawing_modes, marker, circle, rectangle, polyline
                 zIndex: rectangle[0].z_index
             }
         });
-    
+
     window[map_id + 'googleDrawingManager'] = drawingManager;
     drawingManager.setMap(window[map_id + 'map']);
 
@@ -108,8 +108,8 @@ function marker_complete (map_id, drawingManager, drawingInfo) {
             },
             drawingInfo
         );
-        
-        var event_return_type = window.params[1].event_return_type;
+
+        var event_return_type = window.googleway.params[1].event_return_type;
         eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
         Shiny.onInputChange(map_id + "_markercomplete", eventInfo);
     });
@@ -124,7 +124,7 @@ function circle_complete (map_id, drawingManager, drawingInfo) {
 
     var newShape = circle;
     google.maps.event.addListener(newShape, 'click', function(){
-        console.log('click');
+        //console.log('click');
     });
 
     window[map_id + 'googleDrawingOverlays'].push(circle);
@@ -138,7 +138,7 @@ function circle_complete (map_id, drawingManager, drawingInfo) {
         },
         drawingInfo
     );
-    var event_return_type = window.params[1].event_return_type;
+    var event_return_type = window.googleway.params[1].event_return_type;
     eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
     Shiny.onInputChange(map_id + "_circlecomplete", eventInfo);
     });
@@ -159,7 +159,7 @@ function rectangle_complete(map_id, drawingManager, drawingInfo){
       },
       drawingInfo
     );
-    var event_return_type = window.params[1].event_return_type;
+    var event_return_type = window.googleway.params[1].event_return_type;
     eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
     Shiny.onInputChange(map_id + "_rectanglecomplete", eventInfo);
   });
@@ -181,7 +181,7 @@ function polyline_complete(map_id, drawingManager, drawingInfo){
       },
       drawingInfo
     );
-          var event_return_type = window.params[1].event_return_type;
+          var event_return_type = window.googleway.params[1].event_return_type;
       eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
   Shiny.onInputChange(map_id + "_polylinecomplete", eventInfo);
   });
@@ -203,7 +203,7 @@ function polygon_complete(map_id, drawingManager, drawingInfo){
       },
       drawingInfo
     );
-          var event_return_type = window.params[1].event_return_type;
+          var event_return_type = window.googleway.params[1].event_return_type;
       eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
   Shiny.onInputChange(map_id + "_polygoncomplete", eventInfo);
   });

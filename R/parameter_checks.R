@@ -226,14 +226,15 @@ validateAlternatives <- function(alternatives){
 
 validateArrivalTime <- function(arrival_time){
 
-  if(is.null(arrival_time)) return(NULL)
+  if(is.null(arrival_time)) return( NULL )
 
   checkPosix(arrival_time)
+
   return(arrival_time)
 }
 
-validateArrivalDepartureTimes <- function(arrival_time, departure_time){
 
+validateArrivalDepartureTimes <- function(arrival_time, departure_time){
 
   if(!is.null(arrival_time) & !is.null(departure_time)){
     warning("you have supplied both an arrival_time and a departure_time - only one is allowed. The arrival_time will be ignored")
@@ -304,19 +305,78 @@ validateComponentsCountries <- function(components){
   return(components)
 }
 
-validateDepartureTime <- function(departure_time){
+validateDepartureTime <- function(departure_time, mode){
   if(is.null(departure_time)) return(NULL)
 
-  checkPosix(departure_time)
+  if (inherits(departure_time, "POSIXct")) {
+    checkPosix( departure_time )
 
-  if(departure_time < Sys.time()){
-    stop("departure_time must not be in the past")
+    if(mode == "driving" && ( departure_time + 60) < Sys.time() ){ ## allowing a buffer
+      stop("departure_time for driving mode must not be in the past")
+    }
+
+    return( as.integer(departure_time ) )
+
+  } else if ( inherits(departure_time, "character") ) {
+    if( departure_time != "now") {
+      stop("when using a string for departure_time you may only use 'now'")
+    }
+  }
+  return( departure_time )
+}
+
+validateFindInput <- function( input, inputtype ) {
+  ## if phonenumber , "+" needs to be encoded to %2B
+  if( inputtype == "phonenumber") {
+    input <- gsub("\\+","%2B",input)
+  }
+  return( input )
+}
+
+validateLocationPoint <- function( point ) {
+  if(is.null(point)) return(NULL)
+  point <- validateGeocodeLocation( point )
+  return(
+    paste0("point:",point)
+  )
+}
+
+validateLocationCircle <- function( circle ) {
+  if(is.null(circle)) return(NULL)
+  if( is.null( circle[['radius']] ) || is.null( circle[['point']] ) ) {
+    stop("circle list must include radius and point elements")
+  }
+  return(
+    paste0("circle:", circle[['radius']],"@", paste0(circle[['point']], collapse = ",") )
+  )
+}
+
+validateLocationRectangle <- function( rectangle ) {
+  if(is.null(rectangle)) return(NULL)
+  if( is.null( rectangle[['sw']] ) || is.null( rectangle[['ne']] ) ) {
+    stop("rectangle list must include sw and ne elements")
   }
 
-  return(departure_time)
+  sw <- paste0(rectangle[['sw']], collapse = ",")
+  ne <- paste0(rectangle[['ne']], collapse = ",")
+  return(
+    paste0("rectangle:",sw, "|", ne)
+  )
 }
 
 
+validateLocationBias <- function( point, circle, rectangle ) {
+  if( !is.null(point) ) {
+    return( point )
+  }
+  if (!is.null( circle )) {
+    return( circle )
+  }
+  if (!is.null( rectangle )) {
+    return ( rectangle )
+  }
+  return( NULL )
+}
 
 validateLanguage <- function(language){
   if(is.null(language)) return(NULL)
@@ -371,12 +431,25 @@ validateHeading <- function(heading){
 validateLocationSearch <- function(location, search_string, radius, rankby, keyword, name, place_type){
   if(is.null(location)) return(NULL)
 
+  ## if using rankby="distance"
+  if(!is.null(rankby)) {
+    if(rankby == "distance") {
+      if(!is.null(radius)) {
+        stop("If using rankby, radius must not be specified")
+      }
+    }
+  }
+
+  if(!is.null(radius) && !is.null(rankby)) {
+    stop("rankby must not be included if radius is specified")
+  }
+
   ## radius must be included if using a location search
-  if(is.null(search_string) & !is.null(location) & is.null(radius))
+  if(is.null(search_string) && is.null(radius) & is.null(rankby))
     stop("you must specify a radius if only using a 'location' search")
 
   ## if rankby == distance, then one of keyword, name or place_type must be specified
-  if(!is.null(rankby) & !is.null(location)){
+  if(!is.null(rankby)){
     if(rankby == "distance" &
        is.null(keyword) & is.null(name) & is.null(place_type))
       stop("you have specified rankby to be 'distance', so you must provide one of 'keyword','name' or 'place_type'")
@@ -435,6 +508,13 @@ validatePitch <- function(pitch){
   return(pitch)
 }
 
+# validatePlaceInput <- function( inputtype ) {
+#   if ( !( intputtype == "textxquery" || inputtype == "phonenumber") ) {
+#     stop("inputtype must be one of textquery or phonenumber")
+#   }
+#   return( inputtype )
+# }
+
 validatePlaceType <- function(place_type){
   if(is.null(place_type)) return(NULL)
 
@@ -465,24 +545,25 @@ validatePriceRange <- function(price_range){
 }
 
 
-validateRadar <- function(radar, search_string, keyword, name, place_type, location, radius){
+validateRadar <- function(radar){
   ## if radar search, must provide location, key, radius
   ## if radar search, one of keyword, name or type
-  if(isTRUE(radar)){
-    if(!is.null(search_string))
-      warning("the search_string in a radar search will be ignored")
-
-    if(is.null(keyword) & is.null(name) & is.null(place_type))
-      stop("when using a radar search, one of keyword, name or place_type must be provided")
-
-    if(is.null(location))
-      stop("when using a radar search, location must be provided")
-
-    if(is.null(radius))
-      stop("when using a radar search, radius must be provided")
-  }
-
-  return(radar)
+  # if(isTRUE(radar)){
+  #   if(!is.null(search_string))
+  #     warning("the search_string in a radar search will be ignored")
+  #
+  #   if(is.null(keyword) & is.null(name) & is.null(place_type))
+  #     stop("when using a radar search, one of keyword, name or place_type must be provided")
+  #
+  #   if(is.null(location))
+  #     stop("when using a radar search, location must be provided")
+  #
+  #   if(is.null(radius))
+  #     stop("when using a radar search, radius must be provided")
+  # }
+  #
+  # return(radar)
+  message("The radar argument is now deprecated")
 }
 
 validateRadius <- function(radius){
@@ -517,8 +598,8 @@ validateRankBy <- function(rankby, location, search_string){
 
   ## rankby has correct arguments
   if(!is.null(location))
-    if(!rankby %in% c("prominence","distance","location"))
-      stop("rankby must be one of either prominence, distance or location")
+    if(!rankby %in% c("prominence","distance"))
+      stop("rankby must be one of either prominence or distance")
 
   ## warning if rankby used with search_string
   if(!is.null(search_string))
@@ -572,9 +653,10 @@ validateTrafficModel <- function(traffic_model){
 }
 
 ## transit_mode is only valid where mode = transit
-validateTransitMode <- function(transit_mode, mode){
+validateTransitMode <- function(transit_mode, mode) {
 
-  if(!is.null(transit_mode) & mode != "transit"){
+  if(!is.null(transit_mode) & mode != "transit") {
+
     warning("You have specified a transit_mode, but are not using mode = 'transit'. Therefore this argument will be ignored")
     return(NULL)
   }else if(!is.null(transit_mode) & mode == "transit"){

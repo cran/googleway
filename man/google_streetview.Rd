@@ -4,10 +4,18 @@
 \alias{google_streetview}
 \title{Google street view}
 \usage{
-google_streetview(location = NULL, panorama_id = NULL, size = c(400, 400),
-  heading = NULL, fov = 90, pitch = 0, output = c("plot", "html"),
-  response_check = FALSE, signature = NULL,
-  key = get_api_key("streetview"))
+google_streetview(
+  location = NULL,
+  panorama_id = NULL,
+  size = c(400, 400),
+  heading = NULL,
+  fov = 90,
+  pitch = 0,
+  output = c("plot", "html"),
+  response_check = FALSE,
+  signature = NULL,
+  key = get_api_key("streetview")
+)
 }
 \arguments{
 \item{location}{numeric vector of lat/lon coordinates, or an address string.}
@@ -44,7 +52,7 @@ a blank image will be displayed saying 'Sorry, we have no imagery here'.}
 
 \item{signature}{a digitial signature used to verify that any site generating
 requests using your API key is authorised to do so. See Google Documentation
-for further details \url{https://developers.google.com/maps/documentation/streetview/intro}}
+for further details \url{https://developers.google.com/maps/documentation/streetview/overview}}
 
 \item{key}{string. A valid Google Developers Street View Image API key}
 }

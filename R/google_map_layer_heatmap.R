@@ -1,10 +1,11 @@
 googleHeatmapDependency <- function() {
   list(
-    htmltools::htmlDependency(
-      "heatmap",
-      "1.0.0",
-      system.file("htmlwidgets/lib/heatmap", package = "googleway"),
-      script = c("heatmap.js")
+    createHtmlDependency(
+      name = "heatmap",
+      version = "1.0.0",
+      src = system.file("htmlwidgets/lib/heatmap", package = "googleway"),
+      script = c("heatmap.js"),
+      all_files = FALSE
     )
   )
 }
@@ -83,8 +84,20 @@ add_heatmap <- function(map,
   ## TODO:
   ## - max intensity
 
-  objArgs <- match.call(expand.dots = F)
-
+  # objArgs <- match.call(expand.dots = F)
+  objArgs <- list()
+  objArgs[["lat"]] <- force( lat )
+  objArgs[["lon"]] <- force( lon )
+  objArgs[["weight"]] <- force( weight )
+  objArgs[["option_gradient"]] <- force( option_gradient )
+  objArgs[["option_dissipating"]] <- force( option_dissipating )
+  objArgs[["option_radius"]] <- force( option_radius )
+  objArgs[["option_opacity"]] <- force( option_opacity )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["update_map_view"]] <- force( update_map_view )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
 
   ## PARAMETER CHECKS
   if(!dataCheck(data, "add_heatmap")) data <- heatmapDefaults(1)
@@ -220,9 +233,24 @@ update_heatmap <- function(map,
                            update_map_view = TRUE,
                            digits = 4,
                            legend = F,
-                           legend_options = NULL){
+                           legend_options = NULL
+                           ){
 
-  objArgs <- match.call(expand.dots = F)
+  # objArgs <- match.call(expand.dots = F)
+  objArgs <- list()
+  objArgs[["lat"]] <- force( lat )
+  objArgs[["lon"]] <- force( lon )
+  objArgs[["weight"]] <- force( weight )
+  objArgs[["option_gradient"]] <- force( option_gradient )
+  objArgs[["option_dissipating"]] <- force( option_dissipating )
+  objArgs[["option_radius"]] <- force( option_radius )
+  objArgs[["option_opacity"]] <- force( option_opacity )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["update_map_view"]] <- force( update_map_view )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
+
   if(!dataCheck(data, "update_heatmap")) data <- heatmapDefaults(1)
   layer_id <- layerId(layer_id)
   objArgs <- latLonCheck(objArgs, lat, lon, names(data), "update_heatmap")

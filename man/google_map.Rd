@@ -5,19 +5,34 @@
 \alias{googleway}
 \title{Google map}
 \usage{
-google_map(key = get_api_key("map"), data = NULL, location = NULL,
-  zoom = NULL, width = NULL, height = NULL, padding = 0,
-  styles = NULL, search_box = FALSE, update_map_view = TRUE,
-  zoom_control = TRUE, map_type_control = TRUE, scale_control = FALSE,
-  street_view_control = TRUE, rotate_control = TRUE,
-  fullscreen_control = TRUE, libraries = NULL, split_view = NULL,
-  split_view_options = NULL, geolocation = FALSE,
-  event_return_type = c("list", "json"))
+google_map(
+  data = NULL,
+  key = get_api_key("map"),
+  location = NULL,
+  zoom = NULL,
+  width = NULL,
+  height = NULL,
+  padding = 0,
+  styles = NULL,
+  search_box = FALSE,
+  update_map_view = TRUE,
+  zoom_control = TRUE,
+  map_type_control = TRUE,
+  scale_control = FALSE,
+  street_view_control = TRUE,
+  rotate_control = TRUE,
+  fullscreen_control = TRUE,
+  libraries = NULL,
+  split_view = NULL,
+  split_view_options = NULL,
+  geolocation = FALSE,
+  event_return_type = c("list", "json")
+)
 }
 \arguments{
-\item{key}{A valid Google Maps API key.}
-
 \item{data}{data to be used on the map. Either a data.frame, or an \code{sf} object. See details}
+
+\item{key}{A valid Google Maps API key.}
 
 \item{location}{\code{numeric} vector of latitude/longitude (in that order)
 coordinates for the initial starting position of the map.
@@ -51,7 +66,7 @@ See the Google documentation for details \url{https://developers.google.com/maps
 
 \item{fullscreen_control}{logical indicating if the full screen control should be displayed}
 
-\item{libraries}{vector containgin the libraries you want to load. See details}
+\item{libraries}{vector containing the libraries you want to load. See details}
 
 \item{split_view}{string giving the name of a UI output element in which to place
 a streetview representation of the map. Will only work in an interactive environment (shiny).}
@@ -70,7 +85,7 @@ Generates a google map object
 }
 \details{
 In order to use Google Maps you need a valid Google Maps Web JavaScript API key.
-See the Google Maps API documentation \url{https://developers.google.com/maps/}
+See the Google Maps API documentation \url{https://cloud.google.com/maps-platform/}
 
 The data argument is only needed if you call other functions to add layers to the map,
 such as \code{add_markers()} or \code{add_polylines}. However, the data argument

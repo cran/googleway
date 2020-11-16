@@ -4,9 +4,16 @@
 \alias{google_geocode}
 \title{Google geocoding}
 \usage{
-google_geocode(address, bounds = NULL, key = get_api_key("geocode"),
-  language = NULL, region = NULL, components = NULL, simplify = TRUE,
-  curl_proxy = NULL)
+google_geocode(
+  address,
+  bounds = NULL,
+  key = get_api_key("geocode"),
+  language = NULL,
+  region = NULL,
+  components = NULL,
+  simplify = TRUE,
+  curl_proxy = NULL
+)
 }
 \arguments{
 \item{address}{\code{string}. The street address that you want to geocode, in the
@@ -25,7 +32,7 @@ from which the request was sent}
 
 \item{region}{\code{string}. Specifies the region code, specified as a ccTLD
 ("top-level domain"). See region basing for details
-\url{https://developers.google.com/maps/documentation/directions/intro#RegionBiasing}}
+\url{https://developers.google.com/maps/documentation/directions/overview#RegionBiasing}}
 
 \item{components}{\code{data.frame} of two columns, component and value. Restricts
 the results to a specific area. One or more of "route","locality","administrative_area",

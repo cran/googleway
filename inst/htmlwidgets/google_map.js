@@ -27,8 +27,8 @@ HTMLWidgets.widget({
                     //console.log("search box");
                     // create a place DOM element
                     window[el.id + 'googleSearchBox'] = document.createElement("input");
-                    window[el.id + 'googleSearchBox'].setAttribute('id', 'pac-input');
-                    window[el.id + 'googleSearchBox'].setAttribute('class', 'controls');
+                    window[el.id + 'googleSearchBox'].setAttribute('id', el.id+'pac-input');
+                    window[el.id + 'googleSearchBox'].setAttribute('class', 'pac-input');
                     window[el.id + 'googleSearchBox'].setAttribute('type', 'text');
                     window[el.id + 'googleSearchBox'].setAttribute('placeholder', 'Search location');
                     document.body.appendChild(window[el.id + 'googleSearchBox']);
@@ -62,8 +62,9 @@ HTMLWidgets.widget({
 
                         if(x.split_view !== null) {
 
-                          //console.log("split view");
-                          //console.log(x.split_view_options);
+                          console.log("split view");
+                          console.log(x.split_view);
+                          console.log(x.split_view_options);
 
                             var panorama = new google.maps.StreetViewPanorama(
                                 document.getElementById(x.split_view), {
@@ -76,14 +77,16 @@ HTMLWidgets.widget({
                                       }
                                 });
 
-                            map.setStreetView(panorama);
+                            map.setStreetView( panorama );
+
+                            window[ el.id + x.split_view ] = panorama;
                         }
 
 
                         //global map object
                         window[el.id + 'map'] = map;
 
-                        if (google !== undefined) {
+                        if (google !== undefined && google.charts !== undefined ) {
                             //console.log("exists");
                             clearInterval(checkExists);
 
@@ -119,6 +122,39 @@ HTMLWidgets.widget({
         };
     }
 });
+
+
+function update_pano( map_id, pano, lat, lon ) {
+
+
+  var pano = window[ map_id + pano];
+  var map = window[ map_id + 'map'];
+  //var center = map.getCenter();
+  var center = {lat: lat, lng: lon};
+
+  //console.log( pano );
+  pano.setPosition( center );
+  //console.log( pano );
+
+  window[ map_id + 'map'].setStreetView( pano );
+
+/*
+  var panorama = new google.maps.StreetViewPanorama(
+      document.getElementById( pano ), {
+          position: {lat: center.lat(), lng: center.lng() },
+          pov: {
+          //    heading: location.heading,
+          //    pitch: location.pitch
+              heading: 34,
+              pitch: 10
+             }
+      });
+*/
+
+
+  //map.setStreetView( panorama );
+  //window[ map_id + 'map'].setStreetView( panorama );
+}
 
 
 
@@ -157,7 +193,6 @@ if (HTMLWidgets.shinyMode) {
         }
     });
 }
-
 
 
 /**
@@ -236,7 +271,7 @@ function initialise_map(el, x) {
 
     // if places
     if (x.search_box === true) {
-        input = document.getElementById('pac-input');
+        input = document.getElementById(el.id+'pac-input');
 
         window[el.id + 'googleSearchBox'] = new google.maps.places.SearchBox(input);
         window[el.id + 'map'].controls[google.maps.ControlPosition.TOP_LEFT].push(input);
@@ -315,6 +350,7 @@ function initialise_map(el, x) {
                         };
 
                     eventInfo = event_return_type === "list" ? eventInfo : JSON.stringify(eventInfo);
+
                     Shiny.onInputChange(el.id + "_place_search", eventInfo);
                 }
 

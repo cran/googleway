@@ -1,10 +1,11 @@
 googleCircleDependency <- function() {
   list(
-    htmltools::htmlDependency(
-      "circles",
-      "1.0.0",
-      system.file("htmlwidgets/lib/circles", package = "googleway"),
-      script = c("circles.js")
+    createHtmlDependency(
+      name = "circles",
+      version = "1.0.0",
+      src = system.file("htmlwidgets/lib/circles", package = "googleway"),
+      script = c("circles.js"),
+      all_files = FALSE
     )
   )
 }
@@ -175,7 +176,33 @@ add_circles <- function(map,
                         focus_layer = FALSE
                         ){
 
-  objArgs <- match.call(expand.dots = F)
+  #objArgs <- match.call(expand.dots = F)
+  objArgs <- list()
+  objArgs[["id"]] <- force( id )
+  objArgs[["lat"]] <- force( lat )
+  objArgs[["lon"]] <- force( lon )
+  objArgs[["polyline"]] <- force( polyline )
+  objArgs[["radius"]] <- force( radius )
+  objArgs[["editable"]] <- force( editable )
+  objArgs[["draggable"]] <- force( draggable )
+  objArgs[["stroke_colour"]] <- force( stroke_colour )
+  objArgs[["stroke_opacity"]] <- force( stroke_opacity )
+  objArgs[["stroke_weight"]] <- force( stroke_weight )
+  objArgs[["fill_colour"]] <- force( fill_colour )
+  objArgs[["fill_opacity"]] <- force( fill_opacity )
+  objArgs[["mouse_over"]] <- force( mouse_over )
+  objArgs[["mouse_over_group"]] <- force( mouse_over_group )
+  objArgs[["info_window"]] <- force( info_window )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["update_map_view"]] <- force( update_map_view )
+  objArgs[["z_index"]] <- force( z_index )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["palette"]] <- force( palette )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
+  objArgs[["load_interval"]] <- force( load_interval )
+  objArgs[["focus_layer"]] <- force( focus_layer )
+
 
   data <- normaliseSfData(data, "POINT")
   polyline <- findEncodedColumn(data, polyline)
@@ -206,6 +233,8 @@ add_circles <- function(map,
   numericCheck(z_index)
   loadIntervalCheck(load_interval)
   palette <- paletteCheck(palette)
+
+  objArgs <- zIndexCheck( objArgs, z_index )
 
   ## END PARAMETER CHECKS
 
@@ -282,7 +311,23 @@ update_circles <- function(map, data, id,
                            legend_options = NULL
                            ){
 
-  objArgs <- match.call(expand.dots = F)
+  # objArgs <- match.call(expand.dots = F)
+
+  objArgs <- list()
+  objArgs[["id"]] <- force( id )
+  objArgs[["radius"]] <- force( radius )
+  objArgs[["draggable"]] <- force( draggable )
+  objArgs[["stroke_colour"]] <- force( stroke_colour )
+  objArgs[["stroke_weight"]] <- force( stroke_weight )
+  objArgs[["stroke_opacity"]] <- force( stroke_opacity )
+  objArgs[["fill_colour"]] <- force( fill_colour )
+  objArgs[["fill_opacity"]] <- force( fill_opacity )
+  objArgs[["info_window"]] <- force( info_window )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["palette"]] <- force( palette )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
 
   # data <- normaliseSfData(data, "POINT")
   # polyline <- findEncodedColumn(data, polyline)

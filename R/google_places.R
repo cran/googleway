@@ -10,7 +10,7 @@
 #' @note
 #' The Google Places API Web Service enforces a default limit of 1,000 free requests
 #' per 24 hour period, calculated as the sum of client-side and server-side requets.
-#' See \url{https://developers.google.com/places/web-service/usage} for details.
+#' See \url{https://developers.google.com/places/web-service/usage-and-billing} for details.
 #'
 #' Use of the Places Library must be in accordance with the polices described
 #' for the Google Places API Web Service \url{https://developers.google.com/places/web-service/policies}
@@ -248,6 +248,9 @@ google_places <- function(
 #' \donttest{
 #'
 #' ## specifying fields
+#'
+#' set_key( "your_api_key" )
+#'
 #' google_find_place(
 #'   input = "Museum of Contemporary Art Australia"
 #'   , fields = c("photos","formatted_address","name","rating","opening_hours","geometry")

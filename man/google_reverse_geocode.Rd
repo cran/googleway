@@ -4,15 +4,21 @@
 \alias{google_reverse_geocode}
 \title{Google reverse geocoding}
 \usage{
-google_reverse_geocode(location, result_type = NULL, location_type = NULL,
-  language = NULL, key = get_api_key("reverse_geocode"), simplify = TRUE,
-  curl_proxy = NULL)
+google_reverse_geocode(
+  location,
+  result_type = NULL,
+  location_type = NULL,
+  language = NULL,
+  key = get_api_key("reverse_geocode"),
+  simplify = TRUE,
+  curl_proxy = NULL
+)
 }
 \arguments{
 \item{location}{numeric vector of lat/lon coordinates.}
 
 \item{result_type}{string vector - one or more address types.
-See \url{https://developers.google.com/maps/documentation/geocoding/intro#Types}
+See \url{https://developers.google.com/maps/documentation/geocoding/overview#Types}
 for list of available types.}
 
 \item{location_type}{string vector specifying a location type will restrict the

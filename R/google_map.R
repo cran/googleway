@@ -27,7 +27,7 @@
 #' @param street_view_control logical indicating if the street view control should be displayed
 #' @param rotate_control logical indicating if the rotate control should be displayed
 #' @param fullscreen_control logical indicating if the full screen control should be displayed
-#' @param libraries vector containgin the libraries you want to load. See details
+#' @param libraries vector containing the libraries you want to load. See details
 #' @param split_view string giving the name of a UI output element in which to place
 #' a streetview representation of the map. Will only work in an interactive environment (shiny).
 #' @param split_view_options list of options to pass to the split street view.
@@ -40,7 +40,7 @@
 #' @details
 #'
 #' In order to use Google Maps you need a valid Google Maps Web JavaScript API key.
-#' See the Google Maps API documentation \url{https://developers.google.com/maps/}
+#' See the Google Maps API documentation \url{https://cloud.google.com/maps-platform/}
 #'
 #' The data argument is only needed if you call other functions to add layers to the map,
 #' such as \code{add_markers()} or \code{add_polylines}. However, the data argument
@@ -98,8 +98,8 @@
 #' @seealso \link{google_mapOutput}
 #'
 #' @export
-google_map <- function(key = get_api_key("map"),
-                       data = NULL,
+google_map <- function(data = NULL,
+                       key = get_api_key("map"),
                        location = NULL,
                        zoom = NULL,
                        width = NULL,
@@ -130,8 +130,6 @@ google_map <- function(key = get_api_key("map"),
   logicalCheck(geolocation)
   event_return_type <- match.arg(event_return_type)
 
-  # split_view_options = list(heading = 34,
-  #                            pitch = 10)
   split_view_options <- splitViewOptions(split_view_options)
 
   if(is.null(libraries))
@@ -195,7 +193,7 @@ google_map <- function(key = get_api_key("map"),
       htmltools::htmlDependency(
         name = "googleway",
         version = "9999",
-        src=".",
+        src= ".",
         head = header,
         all_files = FALSE
         )
@@ -262,6 +260,21 @@ update_style <- function(map, styles = NULL){
   invoke_method(map, 'update_style', styles)
 }
 
+# Update Pano
+#
+# @param map
+# @param pano
+# @param lat
+# @param lon
+#
+update_pano <- function(map, pano, lat, lon) {
+
+  ## TODO( lat & lon can only be single values)
+
+  invoke_method(map, "update_pano", pano, lat, lon)
+}
+
+
 #' Shiny bindings for google_map
 #'
 #' Output and render functions for using google_map within Shiny applications and interactive Rmd documents.
@@ -314,7 +327,7 @@ update_style <- function(map, styles = NULL){
 #' )
 #'
 #' server <- function(input, output) {
-#'   set_key("your_api_key")
+#'   #set_key("your_api_key")
 #'
 #'   output$map <- renderGoogle_map({
 #'     google_map(location = c(-37.817386, 144.967463),

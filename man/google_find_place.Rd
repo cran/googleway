@@ -4,10 +4,18 @@
 \alias{google_find_place}
 \title{Google Find Place}
 \usage{
-google_find_place(input, inputtype = c("textquery", "phonenumber"),
-  language = NULL, fields = place_fields(), point = NULL, circle = NULL,
-  rectangle = NULL, simplify = TRUE, curl_proxy = NULL,
-  key = get_api_key("find_place"))
+google_find_place(
+  input,
+  inputtype = c("textquery", "phonenumber"),
+  language = NULL,
+  fields = place_fields(),
+  point = NULL,
+  circle = NULL,
+  rectangle = NULL,
+  simplify = TRUE,
+  curl_proxy = NULL,
+  key = get_api_key("find_place")
+)
 }
 \arguments{
 \item{input}{The text input specifying which place to search for
@@ -65,6 +73,9 @@ and atmosphere fields are billed at a hihger rate. See pricing sheet for more in
 \donttest{
 
 ## specifying fields
+
+set_key( "your_api_key" )
+
 google_find_place(
   input = "Museum of Contemporary Art Australia"
   , fields = c("photos","formatted_address","name","rating","opening_hours","geometry")

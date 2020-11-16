@@ -4,19 +4,26 @@
 \alias{google_map_directions}
 \title{Google Map Directions}
 \usage{
-google_map_directions(origin = NULL, origin_place_id = NULL,
-  destination = NULL, destination_place_id = NULL, travel_mode = NULL,
-  dir_action = NULL, waypoints = NULL, waypoint_place_ids = NULL)
+google_map_directions(
+  origin = NULL,
+  origin_place_id = NULL,
+  destination = NULL,
+  destination_place_id = NULL,
+  travel_mode = NULL,
+  dir_action = NULL,
+  waypoints = NULL,
+  waypoint_place_ids = NULL
+)
 }
 \arguments{
 \item{origin}{string of an address or search term, or vector of lat/lon coordinates}
 
-\item{origin_place_id}{a Google place id (\url{https://developers.google.com/places/place-id}).
+\item{origin_place_id}{a Google place id (\url{https://developers.google.com/places/web-service/place-id}).
 If used, you must also specify an \code{origin}}
 
 \item{destination}{string of an address or vector of lat/lon coordinates}
 
-\item{destination_place_id}{a Google place id (\url{https://developers.google.com/places/place-id}).
+\item{destination_place_id}{a Google place id (\url{https://developers.google.com/places/web-service/place-id}).
 If used, you must also specify an \code{destination}}
 
 \item{travel_mode}{one of \code{driving}, \code{walking}, \code{bicycling} or

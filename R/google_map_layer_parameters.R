@@ -30,7 +30,7 @@ heatWeightCheck <- function(objArgs){
   return(objArgs)
 }
 
-isUrl <- function(txt) grepl("(^http)|(^www)", txt)
+isUrl <- function(txt) grepl("(^http)|(^www)|(^file)", txt)
 
 
 # Is Using Polyline
@@ -249,3 +249,10 @@ polyIdCheck <- function(data, id, usePolyline, objArgs){
 
 # some browsers don't support the alpha channel
 removeAlpha <- function(cols) substr(cols, 1, 7)
+
+zIndexCheck <- function( objArgs, z_index ) {
+  if(!is.null(z_index)) {
+    objArgs[['z_index']] <- z_index
+  }
+  return( objArgs )
+}

@@ -4,11 +4,23 @@
 \alias{google_places}
 \title{Google places}
 \usage{
-google_places(search_string = NULL, location = NULL, radius = NULL,
-  rankby = NULL, keyword = NULL, language = NULL, name = NULL,
-  place_type = NULL, price_range = NULL, open_now = NULL,
-  page_token = NULL, simplify = TRUE, curl_proxy = NULL,
-  key = get_api_key("places"), radar = NULL)
+google_places(
+  search_string = NULL,
+  location = NULL,
+  radius = NULL,
+  rankby = NULL,
+  keyword = NULL,
+  language = NULL,
+  name = NULL,
+  place_type = NULL,
+  price_range = NULL,
+  open_now = NULL,
+  page_token = NULL,
+  simplify = TRUE,
+  curl_proxy = NULL,
+  key = get_api_key("places"),
+  radar = NULL
+)
 }
 \arguments{
 \item{search_string}{\code{string} A search term representing a place for
@@ -118,7 +130,7 @@ search radius may be included.
 \note{
 The Google Places API Web Service enforces a default limit of 1,000 free requests
 per 24 hour period, calculated as the sum of client-side and server-side requets.
-See \url{https://developers.google.com/places/web-service/usage} for details.
+See \url{https://developers.google.com/places/web-service/usage-and-billing} for details.
 
 Use of the Places Library must be in accordance with the polices described
 for the Google Places API Web Service \url{https://developers.google.com/places/web-service/policies}

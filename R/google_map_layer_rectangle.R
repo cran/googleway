@@ -1,10 +1,11 @@
 googleRectangleDependency <- function() {
   list(
-    htmltools::htmlDependency(
-      "rectangles",
-      "1.0.0",
-      system.file("htmlwidgets/lib/rectangles", package = "googleway"),
-      script = c("rectangles.js")
+    createHtmlDependency(
+      name = "rectangles",
+      version = "1.0.0",
+      src = system.file("htmlwidgets/lib/rectangles", package = "googleway"),
+      script = c("rectangles.js"),
+      all_files = FALSE
     )
   )
 }
@@ -92,7 +93,32 @@ add_rectangles <- function(map,
                            focus_layer = FALSE
                            ){
 
-  objArgs <- match.call(expand.dots = F)
+  #objArgs <- match.call(expand.dots = F)
+  objArgs <- list()
+  objArgs[["north"]] <- force( north )
+  objArgs[["east"]] <- force( east )
+  objArgs[["south"]] <- force( south )
+  objArgs[["west"]] <- force( west )
+  objArgs[["id"]] <- force( id )
+  objArgs[["draggable"]] <- force( draggable )
+  objArgs[["editable"]] <- force( editable )
+  objArgs[["stroke_colour"]] <- force( stroke_colour )
+  objArgs[["stroke_opacity"]] <- force( stroke_opacity )
+  objArgs[["stroke_weight"]] <- force( stroke_weight )
+  objArgs[["fill_colour"]] <- force( fill_colour )
+  objArgs[["fill_opacity"]] <- force( fill_opacity )
+  objArgs[["mouse_over"]] <- force( mouse_over )
+  objArgs[["mouse_over_group"]] <- force( mouse_over_group )
+  objArgs[["info_window"]] <- force( info_window )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["update_map_view"]] <- force( update_map_view )
+  objArgs[["z_index"]] <- force( z_index )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["palette"]] <- force( palette )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
+  objArgs[["load_interval"]] <- force( load_interval )
+  objArgs[["focus_layer"]] <- force( focus_layer )
 
   ## PARAMETER CHECKS
   if(!dataCheck(data, "add_rectangles")) data <- rectangleDefaults(1)
@@ -111,6 +137,7 @@ add_rectangles <- function(map,
     objArgs[['info_window']] <- NULL
   }
 
+  objArgs <- zIndexCheck( objArgs, z_index )
   ## END PARAMETER CHECKS
 
   allCols <- rectangleColumns()
@@ -177,9 +204,23 @@ update_rectangles <- function(map, data, id,
                               digits = 4,
                               palette = NULL,
                               legend = F,
-                              legend_options = NULL){
+                              legend_options = NULL
+                              ){
 
-  objArgs <- match.call(expand.dots = F)
+  #objArgs <- match.call(expand.dots = F)
+  objArgs <- list()
+  objArgs[["draggable"]] <- force( draggable )
+  objArgs[["stroke_colour"]] <- force( stroke_colour )
+  objArgs[["stroke_weight"]] <- force( stroke_weight )
+  objArgs[["stroke_opacity"]] <- force( stroke_opacity )
+  objArgs[["fill_colour"]] <- force( fill_colour )
+  objArgs[["fill_opacity"]] <- force( fill_opacity )
+  objArgs[["info_window"]] <- force( info_window )
+  objArgs[["layer_id"]] <- force( layer_id )
+  objArgs[["digits"]] <- force( digits )
+  objArgs[["palette"]] <- force( palette )
+  objArgs[["legend"]] <- force( legend )
+  objArgs[["legend_options"]] <- force( legend_options )
 
   layer_id <- layerId(layer_id)
   numericCheck(digits)

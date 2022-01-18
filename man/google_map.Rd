@@ -17,6 +17,7 @@ google_map(
   search_box = FALSE,
   update_map_view = TRUE,
   zoom_control = TRUE,
+  map_type = c("roadmap", "satellite", "hybrid", "terrain"),
   map_type_control = TRUE,
   scale_control = FALSE,
   street_view_control = TRUE,
@@ -48,13 +49,15 @@ of the various \code{add_} functions. If null, the map will default to Melbourne
 \item{padding}{the padding of the map}
 
 \item{styles}{JSON string representation of a valid Google Maps styles Array.
-See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/styling}}
+See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/cloud-based-map-styling}}
 
 \item{search_box}{\code{boolean} indicating if a search box should be placed on the map}
 
 \item{update_map_view}{logical indicating if the map should center on the searched location}
 
 \item{zoom_control}{logical indicating if the zoom control should be displayed}
+
+\item{map_type}{defines the type of map to display. One of 'roadmap', 'satellite', 'terrain' or 'hybrid'}
 
 \item{map_type_control}{logical indicating if the map type control should be displayed}
 
@@ -85,7 +88,7 @@ Generates a google map object
 }
 \details{
 In order to use Google Maps you need a valid Google Maps Web JavaScript API key.
-See the Google Maps API documentation \url{https://cloud.google.com/maps-platform/}
+See the Google Maps API documentation \url{https://mapsplatform.google.com/}
 
 The data argument is only needed if you call other functions to add layers to the map,
 such as \code{add_markers()} or \code{add_polylines}. However, the data argument

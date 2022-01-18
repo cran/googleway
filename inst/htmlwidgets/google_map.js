@@ -51,6 +51,7 @@ HTMLWidgets.widget({
                             zoom: x.zoom,
                             styles: JSON.parse(x.styles),
                             zoomControl: x.zoomControl,
+                            mapTypeId: x.mapType,
                             mapTypeControl: x.mapTypeControl,
                             scaleControl: x.scaleControl,
                             streetViewControl: x.streetViewControl,
@@ -105,6 +106,7 @@ HTMLWidgets.widget({
                         zoom: x.zoom,
                         styles: JSON.parse(x.styles),
                         zoomControl: x.zoomControl,
+                        mapTypeId: x.mapType,
                         mapTypeControl: x.mapTypeControl,
                         scaleControl: x.scaleControl,
                         streetViewControl: x.streetViewControl,
@@ -382,7 +384,7 @@ function initialise_map(el, x) {
     }
 
     if( x.geolocation === true) {
-        add_geolocation();
+        add_geolocation(el.id, window[el.id + 'map'], mapInfo );
     }
 
     // listeners

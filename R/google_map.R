@@ -18,10 +18,11 @@
 #' @param height the height of the map
 #' @param padding the padding of the map
 #' @param styles JSON string representation of a valid Google Maps styles Array.
-#' See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/styling}
+#' See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/cloud-based-map-styling}
 #' @param search_box \code{boolean} indicating if a search box should be placed on the map
 #' @param update_map_view logical indicating if the map should center on the searched location
 #' @param zoom_control logical indicating if the zoom control should be displayed
+#' @param map_type defines the type of map to display. One of 'roadmap', 'satellite', 'terrain' or 'hybrid'
 #' @param map_type_control logical indicating if the map type control should be displayed
 #' @param scale_control logical indicating if the scale control should be displayed
 #' @param street_view_control logical indicating if the street view control should be displayed
@@ -40,7 +41,7 @@
 #' @details
 #'
 #' In order to use Google Maps you need a valid Google Maps Web JavaScript API key.
-#' See the Google Maps API documentation \url{https://cloud.google.com/maps-platform/}
+#' See the Google Maps API documentation \url{https://mapsplatform.google.com/}
 #'
 #' The data argument is only needed if you call other functions to add layers to the map,
 #' such as \code{add_markers()} or \code{add_polylines}. However, the data argument
@@ -109,6 +110,7 @@ google_map <- function(data = NULL,
                        search_box = FALSE,
                        update_map_view = TRUE,
                        zoom_control = TRUE,
+                       map_type = c("roadmap","satellite","hybrid","terrain"),
                        map_type_control = TRUE,
                        scale_control = FALSE,
                        street_view_control = TRUE,
@@ -128,6 +130,7 @@ google_map <- function(data = NULL,
   logicalCheck(fullscreen_control)
   logicalCheck(update_map_view)
   logicalCheck(geolocation)
+  map_type <- match.arg(map_type)
   event_return_type <- match.arg(event_return_type)
 
   split_view_options <- splitViewOptions(split_view_options)
@@ -150,6 +153,7 @@ google_map <- function(data = NULL,
     search_box = search_box,
     update_map_view = update_map_view,
     zoomControl = zoom_control,
+    mapType = map_type,
     mapTypeControl = map_type_control,
     scaleControl = scale_control,
     streetViewControl = street_view_control,
@@ -249,7 +253,7 @@ clear_search <- function(map){
 #'
 #' @param map a googleway map object created from \code{google_map()}
 #' @param styles JSON string representation of a valid Google Maps styles Array.
-#' See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/styling}
+#' See the Google documentation for details \url{https://developers.google.com/maps/documentation/javascript/cloud-based-map-styling}
 #'
 #' @export
 update_style <- function(map, styles = NULL){

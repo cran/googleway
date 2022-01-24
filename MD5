@@ -1,4 +1,4 @@
-92d59a9b39688ed9e6371f9009b5b2b7 *DESCRIPTION
+ba9f59811298481b2a8df6aea17a9f93 *DESCRIPTION
 4630e67be2ad11f4155187726e93843b *LICENSE
 2963fdcbde4d5615e5297459a01d77ed *NAMESPACE
 2c29791d15c9a615413120c8ca9d6af9 *R/charts.R
@@ -10,7 +10,7 @@ b7dabcf01c314f0cc1b3b2ef3e2c608d *R/google_directions.R
 e12133418bb5e612b73b16051a23d758 *R/google_elevation.R
 caf4efc0b21df5a35be004639bd4b730 *R/google_geocode.R
 0eb7efbbdca7918ed26e1bf23af7f06e *R/google_keys.R
-4aa263f751513e599bdc4577688e5551 *R/google_map.R
+823d83f28575a44132d6a9b99c1a20c7 *R/google_map.R
 8df54385ac295c810dfbbb448d4f1138 *R/google_map_layer_circle.R
 b5092b088b14d09054223f5d2deb6b2f *R/google_map_layer_drawing.R
 b28ef720a0724e59e4023b8eac935081 *R/google_map_layer_fusion.R
@@ -30,7 +30,7 @@ db693902727d9af2784e28f0b6738a37 *R/google_map_layer_sf.R
 3b0b93c7e112bb601ee5c68c5dee5052 *R/google_map_urls.R
 d05ad92c87692a6985f2996a6c80ddf7 *R/google_place_autocomplete.R
 317022641e643c1fc9b9a1346333b011 *R/google_place_details.R
-1c23e26d4475c85c8b852351d61a27f6 *R/google_places.R
+6a2aeb6ba6beafd997267de8c1cd10dd *R/google_places.R
 d190309c3efccf4ed5ca3218cca52a3d *R/google_reverse_geocode.R
 5152c211249eaa9a119f0872d3fb25e5 *R/google_roads.R
 990120c9c016946e6f335d0cf83a034a *R/google_streetview.R
@@ -59,7 +59,7 @@ ccf46925a0bc83eb6827340a1414f650 *data/tram_route.rda
 cc048234ce3b73a97ae46170bc369e0c *data/tram_stops.rda
 5861e2bd7a283a49e0604cf0588d6111 *inst/doc/googleway-vignette.R
 c49868456b219b64841b7d7a4b561885 *inst/doc/googleway-vignette.Rmd
-68f92036697e1d7260e9e73886096566 *inst/doc/googleway-vignette.html
+bb0d5d60a1d6e8f9bd82e014dc131d65 *inst/doc/googleway-vignette.html
 53f1c5b5eed924e36bde0f69ac33696e *inst/htmlwidgets/google_map.js
 b01fafbcbc470df70e6dbd28ffed2b27 *inst/htmlwidgets/google_map.yaml
 5d7e50ce129b683e23752ebba8864b5f *inst/htmlwidgets/lib/circles/circles.js
@@ -110,7 +110,7 @@ cfd77e53fbfe446f9c3b5fe5dd5c820c *man/google_distance.Rd
 c16394ac2fb9ddbe425747f5463721ab *man/google_geocode.Rd
 1f0fdfa4c0db55c5366910a3294de6f9 *man/google_keys.Rd
 758259b79863811bf1d4220d3ccefdae *man/google_map-shiny.Rd
-d20373fe1c4b8bd50c2d778c74c298ab *man/google_map.Rd
+8e5147e053dec1b7b505e42b09b11474 *man/google_map.Rd
 cebe87d926d153941d9fc3e413e8b2c5 *man/google_map_directions.Rd
 0eeef9b12b721acf9dc8adae399549e8 *man/google_map_panorama.Rd
 481fb79148bc2004ddbf934c80fb9ead *man/google_map_search.Rd
@@ -138,7 +138,7 @@ b1426b61eae6adf7abe5d890475bb1e2 *man/tram_route.Rd
 39bfe25e61a6e416e55c64c07f77d0c2 *man/update_polygons.Rd
 e3dded34b36806c23f2820402a72f1be *man/update_polylines.Rd
 d062d26f311e2c5172b10b3e0497c316 *man/update_rectangles.Rd
-9c99cfcb981afabae359b866ecd56aab *man/update_style.Rd
+3212f97434ed339c12202439fedab5c1 *man/update_style.Rd
 6faae9b557a89fa8f2f5a7f4a41d958f *tests/manual_tests.R
 2662a68ac97532dbfb3af37b3e855219 *tests/testthat.R
 c8189f5b6a329864ab96ac31197c86f8 *tests/testthat/test-colours.R

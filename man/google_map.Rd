@@ -10,6 +10,9 @@ google_map(
   key = get_api_key("map"),
   location = NULL,
   zoom = NULL,
+  min_zoom = NULL,
+  max_zoom = NULL,
+  map_bounds = c(-180, -90, 180, 90),
   width = NULL,
   height = NULL,
   padding = 0,
@@ -41,6 +44,14 @@ The map will automatically set the location and zoom if data is added through on
 of the various \code{add_} functions. If null, the map will default to Melbourne, Australia.}
 
 \item{zoom}{\code{integer} representing the zoom level of the map (0 is fully zoomed out)}
+
+\item{min_zoom}{the maximum zoom level which will be displayed on the map}
+
+\item{max_zoom}{the minimum zoom level which will be displayed on the map}
+
+\item{map_bounds}{the visible bounds of the map, specified as a vector of four
+values of the form (xmin, ymin, xmax, ymax) (i.e., the form of the bounding box
+of `{sf}` objects).}
 
 \item{width}{the width of the map}
 

@@ -39,7 +39,11 @@ HTMLWidgets.widget({
                 var mapDiv = document.getElementById(el.id);
                 mapDiv.className = "googlemap";
 
+                console.log( x );
+
                 if (HTMLWidgets.shinyMode) {
+
+
 
                     // use setInterval to check if the map can be loaded
                     // the map is dependant on the Google Maps JS resource
@@ -49,6 +53,16 @@ HTMLWidgets.widget({
                         var map = new google.maps.Map(mapDiv, {
                             center: {lat: x.lat, lng: x.lng},
                             zoom: x.zoom,
+                            minZoom: x.min_zoom,
+                            maxZoom: x.max_zoom,
+                            restriction: {
+                              latLngBounds: {
+                                north: x.mapBounds.north,
+                                south: x.mapBounds.south,
+                                east: x.mapBounds.east,
+                                west: x.mapBounds.west
+                              }
+                            },
                             styles: JSON.parse(x.styles),
                             zoomControl: x.zoomControl,
                             mapTypeId: x.mapType,
@@ -63,9 +77,9 @@ HTMLWidgets.widget({
 
                         if(x.split_view !== null) {
 
-                          console.log("split view");
-                          console.log(x.split_view);
-                          console.log(x.split_view_options);
+                          //console.log("split view");
+                          //console.log(x.split_view);
+                          //console.log(x.split_view_options);
 
                             var panorama = new google.maps.StreetViewPanorama(
                                 document.getElementById(x.split_view), {
@@ -104,6 +118,16 @@ HTMLWidgets.widget({
                     var map = new google.maps.Map(mapDiv, {
                         center: {lat: x.lat, lng: x.lng},
                         zoom: x.zoom,
+                        minZoom: x.min_zoom,
+                        maxZoom: x.max_zoom,
+                        restriction: {
+                          latLngBounds: {
+                            north: x.mapBounds.north,
+                            south: x.mapBounds.south,
+                            east: x.mapBounds.east,
+                            west: x.mapBounds.west
+                          }
+                        },
                         styles: JSON.parse(x.styles),
                         zoomControl: x.zoomControl,
                         mapTypeId: x.mapType,
@@ -390,8 +414,13 @@ function initialise_map(el, x) {
     // listeners
     mapInfo = {};
     map_click(el.id, window[el.id + 'map'], mapInfo);
+    map_right_click(el.id, window[el.id + 'map'], mapInfo);
     bounds_changed(el.id, window[el.id + 'map'], mapInfo);
     zoom_changed(el.id, window[el.id + 'map'], mapInfo);
+
+    if( HTMLWidgets.shinyMode) {
+      Shiny.setInputValue(el.id + "_initialised", {});
+    }
 }
 
 
@@ -517,9 +546,13 @@ function clearControl(control, legend_id) {
 */
 function clear_object(map_id, objType, layer_id) {
 
+  console.log(window[map_id + objType + layer_id]);
+  console.log(window[map_id + objType + layer_id].length);
+
   var i = 0;
-  if (window[map_id + objType + layer_id] && window[map_id + objType + layer_id].length) {
+  if (window[map_id + objType + layer_id]) {
     for (i = 0; i < window[map_id + objType + layer_id].length; i++) {
+      console.log(window[map_id + objType + layer_id][i]);
     //https://developers.google.com/maps/documentation/javascript/reference/3/#event
     google.maps.event.clearInstanceListeners(window[map_id + objType + layer_id][i]);
     window[map_id + objType + layer_id][i].setMap(null);
@@ -529,6 +562,8 @@ function clear_object(map_id, objType, layer_id) {
 
   clear_legend(map_id, layer_id);
   }
+
+  console.log(window[map_id + objType + layer_id]);
 }
 
 function delay(t, v) {
@@ -536,3 +571,20 @@ function delay(t, v) {
     setTimeout(resolve.bind(null, v), t);
   });
 }
+
+
+function set_map_position(map_id, location, zoom) {
+
+  var latlon = new google.maps.LatLng(location[0], location[1]);
+  set_map_center(map_id, latlon);
+  set_map_zoom(map_id, zoom);
+}
+
+function set_map_center(map_id, latlon) {
+  window[map_id + 'map'].setCenter(latlon);
+}
+
+function set_map_zoom(map_id, zoom) {
+  window[map_id + 'map'].setZoom(zoom);
+}
+

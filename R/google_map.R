@@ -14,6 +14,11 @@
 #' The map will automatically set the location and zoom if data is added through one
 #' of the various \code{add_} functions. If null, the map will default to Melbourne, Australia.
 #' @param zoom \code{integer} representing the zoom level of the map (0 is fully zoomed out)
+#' @param min_zoom the maximum zoom level which will be displayed on the map
+#' @param max_zoom the minimum zoom level which will be displayed on the map
+#' @param map_bounds the visible bounds of the map, specified as a vector of four
+#' values of the form (xmin, ymin, xmax, ymax) (i.e., the form of the bounding box
+#' of `{sf}` objects).
 #' @param width the width of the map
 #' @param height the height of the map
 #' @param padding the padding of the map
@@ -103,6 +108,9 @@ google_map <- function(data = NULL,
                        key = get_api_key("map"),
                        location = NULL,
                        zoom = NULL,
+                       min_zoom = NULL,
+                       max_zoom = NULL,
+                       map_bounds = c(-180, -90, 180, 90),
                        width = NULL,
                        height = NULL,
                        padding = 0,
@@ -133,22 +141,37 @@ google_map <- function(data = NULL,
   map_type <- match.arg(map_type)
   event_return_type <- match.arg(event_return_type)
 
+  if( length(map_bounds) != 4) {
+    stop("map_bounds must be a vector of 4 values specifying xmin, ymin, xmax, ymax")
+  }
+
+  map_bounds <- unname(map_bounds) ## to remove the xmin/max labels added by 'sf::st_bbox()'
+  map_bounds <- list(
+    west = map_bounds[1]
+    , south = map_bounds[2]
+    , east = map_bounds[3]
+    , north = map_bounds[4]
+  )
+
   split_view_options <- splitViewOptions(split_view_options)
 
   if(is.null(libraries))
     libraries <- c("visualization", "geometry", "places", "drawing")
 
   if(is.null(location))
-    location <- c(-37.9, 144.5)  ## Melbourne, Australia
+    location <- c(0, 0)  ## Melbourne, Australia
 
   if(is.null(zoom))
-    zoom <- 8
+    zoom <- 1
 
   # forward options using x
   x = list(
     lat = location[1],
     lng = location[2],
     zoom = zoom,
+    min_zoom = min_zoom,
+    max_zoom = max_zoom,
+    mapBounds = map_bounds,
     styles = styles,
     search_box = search_box,
     update_map_view = update_map_view,
@@ -205,6 +228,16 @@ google_map <- function(data = NULL,
     )
 
   return(googlemap)
+}
+
+#' google map view
+#'
+#' @inheritParams google_map
+#' @param map a googleway map object created from google_map()
+#'
+#' @export
+google_map_view <- function(map, location, zoom) {
+  invoke_method(map, "set_map_position", location, zoom)
 }
 
 splitViewOptions <- function(split_view_options) {

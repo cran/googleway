@@ -1,4 +1,4 @@
-c66d85a80274fb5f518873c1844330e1 *DESCRIPTION
+5d48bac3685bcda7e7c49c510a270a6f *DESCRIPTION
 4630e67be2ad11f4155187726e93843b *LICENSE
 6e9fac83940979bf8b80cd3204bb1814 *NAMESPACE
 2c29791d15c9a615413120c8ca9d6af9 *R/charts.R
@@ -36,7 +36,7 @@ d190309c3efccf4ed5ca3218cca52a3d *R/google_reverse_geocode.R
 990120c9c016946e6f335d0cf83a034a *R/google_streetview.R
 8416285cd788cfe14bf166e9f2a39823 *R/google_timezone.R
 3002e1721a24f22997f789bd02f0fe41 *R/google_utilities.R
-9539bbd26fe330fe55c16e1e53a06dd3 *R/googleway-package.R
+c2b955d2c76d382a58bdb2aae387d5ef *R/googleway-package.R
 19877a1d70f2206d3a979b02a19df2b3 *R/googleway_dependencies.R
 d13671cd7b567693dcbc69b1bbc376a4 *R/info_window.R
 93ea44ea21587ca3e378e1668c67de13 *R/legend.R
@@ -52,14 +52,14 @@ e9038f61699cb13d88f705441d866ee9 *R/results_distance.R
 8e3d08a82130e770d721cf598907cb99 *R/results_places.R
 f2cf599d6eda251239281538292f81a2 *R/results_roads.R
 29e4dc5829fcd01796538687e167ae8d *R/scratch.R
-f61bb107f52e2362c04685f60ea831b7 *build/vignette.rds
+d06fb93bc89f9acc488c6d0361ce1529 *build/vignette.rds
 2029432bbfd4b7591c344cd4baf82edf *data/geo_melbourne.rda
 4872a0dcc754089b7885378a1718498c *data/melbourne.rda
 ccf46925a0bc83eb6827340a1414f650 *data/tram_route.rda
 cc048234ce3b73a97ae46170bc369e0c *data/tram_stops.rda
 5861e2bd7a283a49e0604cf0588d6111 *inst/doc/googleway-vignette.R
 c49868456b219b64841b7d7a4b561885 *inst/doc/googleway-vignette.Rmd
-a3d7cf30095a36d9bceb8490ea3741db *inst/doc/googleway-vignette.html
+e04088561c7a5c06b23aecda88b98e37 *inst/doc/googleway-vignette.html
 17895ab84b7288b27ff3669589070223 *inst/htmlwidgets/google_map.js
 b01fafbcbc470df70e6dbd28ffed2b27 *inst/htmlwidgets/google_map.yaml
 5d7e50ce129b683e23752ebba8864b5f *inst/htmlwidgets/lib/circles/circles.js
